@@ -211,5 +211,4 @@ const renderElements = () => {
   )*/
   renderElement(Nodes.BODY, createPopup(), `beforeend`);
 };
-
 renderElements();
