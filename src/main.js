@@ -16,7 +16,7 @@ const createUserRank = () => {
   return (`<section class="header__profile profile">
   <p class="profile__rating">Movie Buff</p>
   <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-</section>`)
+</section>`);
 };
 
 const createFilmCard = () => {
@@ -36,7 +36,7 @@ const createFilmCard = () => {
     <button class="film-card__controls-item button film-card__controls-item--mark-as-watched">Mark as watched</button>
     <button class="film-card__controls-item button film-card__controls-item--favorite">Mark as favorite</button>
   </form>
-</article>`)
+</article>`);
 };
 
 const createPopup = () => {
@@ -141,7 +141,7 @@ const createPopup = () => {
       </section>
     </div>
   </form>
-</section>`)
+</section>`);
 };
 
 const createNavigation = () => {
@@ -151,7 +151,7 @@ const createNavigation = () => {
   <a href="#history" class="main-navigation__item">History <span class="main-navigation__item-count">4</span></a>
   <a href="#favorites" class="main-navigation__item">Favorites <span class="main-navigation__item-count">8</span></a>
   <a href="#stats" class="main-navigation__item main-navigation__item--additional">Stats</a>
-</nav>`)
+</nav>`);
 };
 
 const createSort = () => {
@@ -159,7 +159,7 @@ const createSort = () => {
   <li><a href="#" class="sort__button sort__button--active">Sort by default</a></li>
   <li><a href="#" class="sort__button">Sort by date</a></li>
   <li><a href="#" class="sort__button">Sort by rating</a></li>
-</ul>`)
+</ul>`);
 };
 
 const createFilmListTemplate = () => {
@@ -168,19 +168,19 @@ const createFilmListTemplate = () => {
     <h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>
     <div class="films-list__container"></div>
   </section>
-</section>`)
+</section>`);
 };
 
 const createExtraList = () => {
   return (`<section class="films-list--extra">
   <h2 class="films-list__title">Top rated</h2>
   <div class="films-list__container"></div>
-</section>`)
+</section>`);
 };
 
 
 const createShowButton = () => {
-  return (`<button class="films-list__show-more">Show more</button>`)
+  return (`<button class="films-list__show-more">Show more</button>`);
 };
 
 const renderElement = (container, template, place) => {
@@ -203,13 +203,13 @@ const renderElements = () => {
   new Array(Count.SEGMENTS).fill(``).forEach(() => renderElement(films, createExtraList(), `beforeend`));
 
   const filmsExtraArr = films.querySelectorAll(`.films-list--extra`);
-  new Array(Count.EXTRA).fill(``).forEach(() => renderElement( filmsExtraArr[0].querySelector(`.films-list__container`), createFilmCard(), `beforeend`))
-  new Array(Count.EXTRA).fill(``).forEach(() => renderElement( filmsExtraArr[1].querySelector(`.films-list__container`), createFilmCard(), `beforeend`))
+  new Array(Count.EXTRA).fill(``).forEach(() => renderElement(filmsExtraArr[0].querySelector(`.films-list__container`), createFilmCard(), `beforeend`))
+  new Array(Count.EXTRA).fill(``).forEach(() => renderElement(filmsExtraArr[1].querySelector(`.films-list__container`), createFilmCard(), `beforeend`))
   /*filmsExtraArr.forEach(() =>
     new Array(Count.EXTRA).fill(``).forEach(() => renderElement( filmsExtraArr[i].querySelector(`.films-list__container`), createFilmCard(), `beforeend`))
-
     не могу понять куда счётчик воткнуть, а this здесь window
   )*/
+  renderElement(Nodes.BODY, createPopup(), `beforeend`);
 };
 
 renderElements();
