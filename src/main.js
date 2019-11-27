@@ -210,5 +210,5 @@ const renderElements = () => {
     не могу понять куда счётчик воткнуть, а this здесь window
   )*/
   renderElement(Nodes.BODY, createPopup(), `beforeend`);
-};
+};npm
 renderElements();
