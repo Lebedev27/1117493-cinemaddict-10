@@ -203,11 +203,9 @@ const renderElements = () => {
   new Array(Count.SEGMENTS).fill(``).forEach(() => renderElement(films, createExtraList(), `beforeend`));
 
   const filmsExtraArr = films.querySelectorAll(`.films-list--extra`);
-  const filmsExtra = films.querySelector(`.films-list--extra`);
-
-  filmsExtraArr.forEach((filmsExtra, index) =>
-    new Array(Count.EXTRA).fill(``).forEach(() => renderElement( filmsExtraArr[index].querySelector(`.films-list__container`), createFilmCard(), `beforeend`))
-  )
+  filmsExtraArr.forEach((item, index) =>
+    new Array(Count.EXTRA).fill(``).forEach(() => renderElement(filmsExtraArr[index].querySelector(`.films-list__container`), createFilmCard(), `beforeend`))
+  );
   renderElement(Nodes.BODY, createPopup(), `beforeend`);
 };
 renderElements();
