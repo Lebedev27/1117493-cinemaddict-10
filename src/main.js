@@ -203,12 +203,11 @@ const renderElements = () => {
   new Array(Count.SEGMENTS).fill(``).forEach(() => renderElement(films, createExtraList(), `beforeend`));
 
   const filmsExtraArr = films.querySelectorAll(`.films-list--extra`);
-  new Array(Count.EXTRA).fill(``).forEach(() => renderElement(filmsExtraArr[0].querySelector(`.films-list__container`), createFilmCard(), `beforeend`))
-  new Array(Count.EXTRA).fill(``).forEach(() => renderElement(filmsExtraArr[1].querySelector(`.films-list__container`), createFilmCard(), `beforeend`))
-  /*filmsExtraArr.forEach(() =>
-    new Array(Count.EXTRA).fill(``).forEach(() => renderElement( filmsExtraArr[i].querySelector(`.films-list__container`), createFilmCard(), `beforeend`))
-    не могу понять куда счётчик воткнуть, а this здесь window
-  )*/
+  const filmsExtra = films.querySelector(`.films-list--extra`);
+
+  filmsExtraArr.forEach((filmsExtra, index) =>
+    new Array(Count.EXTRA).fill(``).forEach(() => renderElement( filmsExtraArr[index].querySelector(`.films-list__container`), createFilmCard(), `beforeend`))
+  )
   renderElement(Nodes.BODY, createPopup(), `beforeend`);
-};npm
+};
 renderElements();
