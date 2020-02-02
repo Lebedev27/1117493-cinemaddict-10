@@ -1,4 +1,6 @@
-export const createFilmPopupTemplate = (data) => {
+import {createElement} from '../util.js';
+
+const createFilmPopupTemplate = (data) => {
   const {title, image, rating, time, genre, description, comments, director, writers, actors, releaseDate, counry} = data;
   return (
     `<section class="film-details">
@@ -121,3 +123,26 @@ export const createFilmPopupTemplate = (data) => {
     </section>`
   );
 };
+
+export default class FilmPopup {
+  constructor(data) {
+    this._data = data;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmPopupTemplate(this._data);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

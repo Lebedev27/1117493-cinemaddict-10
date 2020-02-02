@@ -1,4 +1,6 @@
-const EXTRA_TITLES = [`Top rated`, `Most commented`];
+import {createElement} from '../util.js';
+
+// const EXTRA_TITLES = [`Top rated`, `Most commented`];
 
 const createExtraListMarkup = (title) => {
   return (
@@ -10,8 +12,29 @@ const createExtraListMarkup = (title) => {
   );
 };
 
-const createExtraListTemplate = () => {
-  return EXTRA_TITLES.map(createExtraListMarkup).join(`\n`);
+const createExtraListTemplate = (title) => {
+  return createExtraListMarkup(title);
 };
 
-export {createExtraListTemplate};
+export default class ExtraList {
+  constructor(title) {
+    this._title = title;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createExtraListTemplate(this._title);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
