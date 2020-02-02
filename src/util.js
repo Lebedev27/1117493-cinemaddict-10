@@ -1,4 +1,3 @@
-
 const getRandomBetween = (min, max) => {
   return Math.floor(Math.random() * (max - min) + min);
 };
@@ -9,4 +8,10 @@ const getRandomArrayItem = (array) => {
   return array[randomIndex];
 };
 
-export {getRandomBetween, getRandomArrayItem};
+const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+  return newElement.firstChild;
+};
+
+export {getRandomBetween, getRandomArrayItem, createElement};
