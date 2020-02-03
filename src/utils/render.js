@@ -27,7 +27,7 @@ const createFragment = (arr) => {
 
 const remove = (component) => {
   component.getElement().remove();
-  component.removeElement();
+  component.clearElement();
 };
 
 export {RenderPosition, createElement, renderHtmlPart, createFragment, remove};

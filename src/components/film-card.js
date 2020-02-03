@@ -1,3 +1,4 @@
+import moment from 'moment';
 import AbstractComponent from './abstract-component.js';
 
 const generateFilmCardDescription = (description) => description.length > 140 ? `${description.slice(0, 139)}...` : description;
@@ -5,14 +6,14 @@ const generateFilmCardDescription = (description) => description.length > 140 ? 
 const generateActiveFilmCardControl = (type) => type ? ` film-card__controls-item--active` : ``;
 
 const createFilmCardTemplate = (data) => {
-  const {title, image, rating, year, time, genre, description, comments, isWatchList, isWatched, isFavorite} = data;
+  const {title, image, rating, releaseDate, time, genre, description, comments, isWatchList, isWatched, isFavorite} = data;
 
   return (
     `<article class="film-card">
       <h3 class="film-card__title">${title}</h3>
       <p class="film-card__rating">${rating}</p>
       <p class="film-card__info">
-        <span class="film-card__year">${year}</span>
+        <span class="film-card__year">${moment(releaseDate).format(`YYYY`)}</span>
         <span class="film-card__duration">${time}</span>
         <span class="film-card__genre">${genre[0]}</span>
       </p>

@@ -156,20 +156,12 @@ export default class PageController {
     let sortedFilms = [];
     this._sortingComponent.getElement().querySelector(`.sort__button--active`).classList.remove(`sort__button--active`);
     const setActiveSortButton = () => this._sortingComponent.getElement().querySelector(`.sort__button[data-sort-type="${sortType}"]`).classList.add(`sort__button--active`);
-    switch (sortType) {
-      case SortType.DATE:
-        sortedFilms = sortingFilms(this._cardsData, SortType.DATE);
-        setActiveSortButton();
-        break;
-      case SortType.RATING:
-        sortedFilms = sortingFilms(this._cardsData, SortType.RATING);
-        setActiveSortButton();
-        break;
-      case SortType.DEFAULT:
-        sortedFilms = this._cardsData.slice(0, this._showingTasksCount);
-        setActiveSortButton();
-        break;
+    sortedFilms = sortingFilms(this._cardsData, sortType);
+    if (sortType === SortType.DEFAULT) {
+      sortedFilms = this._cardsData.slice(0, this._showingTasksCount);
     }
+    setActiveSortButton();
+
     this._filmsListContainer.innerHTML = ``;
 
     renderHtmlPart(this._filmsListContainer, createFilmCardFragment(sortedFilms, this._onDataChange, this._onViewChange), RenderPosition.BEFOREEND);

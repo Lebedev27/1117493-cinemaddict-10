@@ -16,4 +16,7 @@ const sortingFilms = (data, type) => {
   return newData;
 };
 
-export {getRandomBetween, getRandomArrayItem, sortingFilms};
+const pluralize = (count, noun, suffix = `s`) =>
+  `${noun}${count !== 1 ? suffix : ``}`;
+
+export {getRandomBetween, getRandomArrayItem, sortingFilms, pluralize};
