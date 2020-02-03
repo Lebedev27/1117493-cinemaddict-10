@@ -1,10 +1,11 @@
 import {Nodes, Count, ExtraTitles, SortType} from '../constants.js';
 import {renderHtmlPart, RenderPosition, createFragment, remove} from '../utils/render.js';
-import {sortingFilms} from '../utils/common.js';
+import {sortFilms} from '../utils/common.js';
 import SortingComponent from '../components/sorting.js';
 import MovieController from '../controllers/movie-сontroller.js';
 import ShowMoreButtonComponent from '../components/show-more-button.js';
 import ExtraListComponent from '../components/extra-list.js';
+import {bindAll} from '../utils/common.js';
 
 const createFilmCardFragment = (cardsData, onDataChange, onViewChange) => {
   const fragment = document.createDocumentFragment();
@@ -20,8 +21,8 @@ const renderExtraFilmCard = (data, node, onDataChange, onViewChange) => {
 };
 
 const renderFilmListExtra = (node, data, onDataChange, onViewChange) => {
-  const ratingSortedFilms = sortingFilms(data, SortType.RATING).slice(0, Count.EXTRA_FILMS);
-  const commentsSortedFilms = sortingFilms(data, SortType.COMMENTS).slice(0, Count.EXTRA_FILMS);
+  const ratingSortedFilms = sortFilms(data, SortType.RATING).slice(0, Count.EXTRA_FILMS);
+  const commentsSortedFilms = sortFilms(data, SortType.COMMENTS).slice(0, Count.EXTRA_FILMS);
 
   const isFilmsUnRated = ratingSortedFilms.every((film) => film.rating === 0);
   const isFilmsUnComment = ratingSortedFilms.every((comment) => comment.comments === 0);
@@ -54,31 +55,37 @@ export default class PageController {
     this._sortingComponent = new SortingComponent();
     this._showMoreButtonComponent = new ShowMoreButtonComponent();
 
-    this._onDataChange = this._onDataChange.bind(this);
-    this._onSortTypeChange = this._onSortTypeChange.bind(this);
-    this._onViewChange = this._onViewChange.bind(this);
-    this._onFilterChange = this._onFilterChange.bind(this);
-    this.showMoreButtonClickHandler = this.showMoreButtonClickHandler.bind(this);
+    bindAll(this, [`_onDataChange`, `_onSortTypeChange`, `_onViewChange`, `_onFilterChange`, `showMoreButtonClickHandler`]);
 
     this._sortingComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     this._filmModel.setFilterChangeHandler(this._onFilterChange);
   }
 
+  hide() {
+    this._container.hide();
+    this._sortingComponent.hide();
+  }
+
+  show() {
+    this._container.show();
+    this._sortingComponent.show();
+  }
+
   render() {
     const filmCards = this._filmModel.getMovies();
 
-    renderHtmlPart(this._nodesMain, createFragment([this._sortingComponent.getElement(), this._container]), RenderPosition.BEFOREEND);
+    renderHtmlPart(this._nodesMain, createFragment([this._sortingComponent.getElement(), this._container.getElement()]), RenderPosition.BEFOREEND);
 
     if (filmCards.length > 0) {
-      this._filmsList = this._container.querySelector(`.films-list`);
-      this._filmsListContainer = this._container.querySelector(`.films-list__container`);
+      this._filmsList = this._container.getElement().querySelector(`.films-list`);
+      this._filmsListContainer = this._container.getElement().querySelector(`.films-list__container`);
 
       const cardsOnStart = filmCards.slice(0, this._showingFilmsCount);
       renderHtmlPart(this._filmsListContainer, createFilmCardFragment(cardsOnStart, this._onDataChange, this._onViewChange), RenderPosition.BEFOREEND);
       this._renderShowMoreButton();
 
-      renderHtmlPart(this._container, createFragment([new ExtraListComponent(ExtraTitles.TOP_RATED).getElement(), new ExtraListComponent(ExtraTitles.MOST_COMMENTED).getElement()]), RenderPosition.BEFOREEND);
-      renderFilmListExtra(this._container, filmCards, this._onDataChange, this._onViewChange);
+      renderHtmlPart(this._container.getElement(), createFragment([new ExtraListComponent(ExtraTitles.TOP_RATED).getElement(), new ExtraListComponent(ExtraTitles.MOST_COMMENTED).getElement()]), RenderPosition.BEFOREEND);
+      renderFilmListExtra(this._container.getElement(), filmCards, this._onDataChange, this._onViewChange);
     }
   }
 
@@ -135,7 +142,7 @@ export default class PageController {
     if (sortType === SortType.DEFAULT) {
       sortedFilms = filmCards.slice(0, this._showingFilmsCount);
     } else {
-      sortedFilms = sortingFilms(filmCards, sortType);
+      sortedFilms = sortFilms(filmCards, sortType);
     }
     setActiveSortButton();
 

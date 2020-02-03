@@ -26,7 +26,8 @@ const generateExceptionsFiltersCount = (item) => {
 
 const generateFilters = () => {
   return Object.values(FilterName).map((item) => {
-    const generateLink = item.slice(0, item.includes(` `) ? item.indexOf(` `) : item.length).toLowerCase();
+    const itemIndexOf = item.indexOf(` `);
+    const generateLink = item.slice(0, itemIndexOf !== -1 ? itemIndexOf : item.length).toLowerCase();
     return {
       name: item,
       link: generateLink,
@@ -38,6 +39,12 @@ const generateFilters = () => {
 const ExtraTitles = {
   TOP_RATED: `Top rated`,
   MOST_COMMENTED: `Most commented`
+};
+
+const GenreIndex = {
+  NAME: 0,
+  VALUE: 1,
+  TOP_GENRE: 0
 };
 
 const SortType = {
@@ -70,4 +77,4 @@ const Mode = {
   POPUP: `popup`,
 };
 
-export {NAMES, Nodes, generateFilters, ExtraTitles, SortType, Count, KeyCode, RenderPosition, Mode, FilterName};
+export {NAMES, GenreIndex, Nodes, generateFilters, ExtraTitles, SortType, Count, KeyCode, RenderPosition, Mode, FilterName};

@@ -104,8 +104,9 @@ const objKeysUppercaseFirstLetter = (obj) => {
   Object.entries(obj).map(([key, property]) => {
     let lowerKey = key[0].toUpperCase() + key.slice(1).toLowerCase();
     if (key.includes(`_`)) {
-      const firstPart = key.split(`_`)[0];
-      const secondPart = key.split(`_`)[1];
+      const splitedKey = key.split(`_`);
+      const firstPart = splitedKey[0];
+      const secondPart = splitedKey[1];
       lowerKey = `${firstPart[0].toUpperCase() + firstPart.slice(1).toLowerCase()} ${secondPart[0].toUpperCase() + secondPart.slice(1).toLowerCase()}`;
     }
     newObj[lowerKey] = property;
@@ -327,7 +328,7 @@ export default class FilmPopup extends AbstractSmartComponent {
   }
 
   watchedControlClickHandler() {
-    this._data.isWatched = !this._data.isWatched;
+    this._data.isWatched = this._data.isWatched ? !this._data.isWatched : new Date();
     this._data.userRating = `0`;
     this.rerender();
   }

@@ -8,7 +8,7 @@ const getRandomArrayItem = (array) => {
   return array[randomIndex];
 };
 
-const sortingFilms = (data, type, reverse) => {
+const sortFilms = (data, type, reverse) => {
   const newData = data.slice();
   if (reverse) {
     newData.sort((a, b) => {
@@ -22,7 +22,21 @@ const sortingFilms = (data, type, reverse) => {
   return newData;
 };
 
+const getRandomDate = () => {
+  const targetDate = new Date();
+  const diffValue = -getRandomBetween(0, 60);
+
+  targetDate.setDate(targetDate.getDate() + diffValue);
+  return targetDate;
+};
+
 const pluralize = (count, noun, suffix = `s`) =>
   `${noun}${count !== 1 ? suffix : ``}`;
 
-export {getRandomBetween, getRandomArrayItem, sortingFilms, pluralize};
+const bindAll = (ctx, props) => {
+  props.forEach((prop) => {
+    ctx[prop] = ctx[prop].bind(ctx);
+  });
+};
+
+export {getRandomDate, getRandomBetween, getRandomArrayItem, sortFilms, pluralize, bindAll};
