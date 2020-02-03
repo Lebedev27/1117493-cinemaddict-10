@@ -6,6 +6,7 @@ import FilmPopupComponent from '../components/film-popup.js';
 import FilmPopupBgComponent from '../components/film-popup-bg.js';
 import {bindAll} from '../utils/common.js';
 
+
 export default class MovieController {
   constructor(container, onDataChange, onViewChange) {
     this._container = container;
@@ -17,8 +18,10 @@ export default class MovieController {
     this._mode = Mode.DEFAULT;
 
     this._filmCardComponent = null;
+
     this._filmCardPopupBgComponent = null;
     this._filmCardPopupComponent = null;
+
 
     bindAll(this, [`_cardClickHandler`, `_removePopupCkickHandler`, `_removePopupKeydownHandler`, `watchListButtonClickHandler`, `watchedButtonClickHandler`, `favoritesButtonClickHandler`, `submitCommentKeydownHandler`]);
   }
@@ -26,6 +29,7 @@ export default class MovieController {
   render(filmCardData) {
     this._cardData = filmCardData;
     this._filmCardComponent = new FilmCardComponent(this._cardData);
+
     this._filmCardPopupBgComponent = new FilmPopupBgComponent(this._cardData);
     this._filmCardPopupComponent = new FilmPopupComponent(this._cardData, this._onDataChange);
 
@@ -33,7 +37,6 @@ export default class MovieController {
     this._filmCardComponent.setWatchListButtonClickHandler(this.watchListButtonClickHandler);
     this._filmCardComponent.setWatchedButtonClickHandler(this.watchedButtonClickHandler);
     this._filmCardComponent.setFavoritesButtonClickHandler(this.favoritesButtonClickHandler);
-
     this._container.appendChild(this._filmCardComponent.getElement());
   }
 
@@ -43,12 +46,15 @@ export default class MovieController {
     }
   }
 
+
   _cardClickHandler(evt) {
+
     const filmTitle = this._filmCardComponent.getElement().querySelector(`h3`);
     const filmImage = this._filmCardComponent.getElement().querySelector(`img`);
     const filmComments = this._filmCardComponent.getElement().querySelector(`a`);
 
     if ([filmTitle, filmImage, filmComments].includes(evt.target)) {
+
       const filmCardPopupBg = this._filmCardPopupBgComponent.getElement();
 
       renderHtmlPart(Nodes.BODY, filmCardPopupBg, RenderPosition.BEFOREEND);
@@ -59,9 +65,11 @@ export default class MovieController {
       document.addEventListener(`keydown`, this._removePopupKeydownHandler);
       document.addEventListener(`keydown`, this.submitCommentKeydownHandler);
 
+
       this._mode = Mode.POPUP;
     }
   }
+
 
   watchListButtonClickHandler(evt) {
     evt.preventDefault();
@@ -122,6 +130,7 @@ export default class MovieController {
 
       remove(this._filmCardPopupComponent);
       remove(this._filmCardPopupBgComponent);
+
     }
   }
 

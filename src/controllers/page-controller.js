@@ -1,6 +1,8 @@
 import {Nodes, Count, ExtraTitles, SortType} from '../constants.js';
 import {renderHtmlPart, RenderPosition, createFragment, remove} from '../utils/render.js';
+
 import {sortFilms} from '../utils/common.js';
+
 import SortingComponent from '../components/sorting.js';
 import MovieController from '../controllers/movie-сontroller.js';
 import ShowMoreButtonComponent from '../components/show-more-button.js';
@@ -16,6 +18,7 @@ const createFilmCardFragment = (cardsData, onDataChange, onViewChange) => {
     const movieController = new MovieController(fragment, onDataChange, onViewChange);
 
     movieController.render(filmData);
+
   });
   return fragment;
 };
@@ -24,9 +27,11 @@ const renderExtraFilmCard = (data, node, onDataChange, onViewChange, moviesModel
   renderHtmlPart(node.querySelector(`.films-list__container`), createFilmCardFragment(data, onDataChange, onViewChange, moviesModel), RenderPosition.BEFOREEND);
 };
 
+
 const renderFilmListExtra = (node, data, onDataChange, onViewChange, moviesModel) => {
   const ratingSortedFilms = sortFilms(data, SortType.RATING).slice(0, Count.EXTRA_FILMS);
   const commentsSortedFilms = sortFilms(data, SortType.COMMENTS, `length`).slice(0, Count.EXTRA_FILMS);
+
 
   const isFilmsUnRated = ratingSortedFilms.every((film) => film.totalRating === 0);
   const isFilmsUnComment = ratingSortedFilms.every((comment) => comment.comments === 0);
@@ -41,6 +46,7 @@ const renderFilmListExtra = (node, data, onDataChange, onViewChange, moviesModel
   if (isFilmsUnComment) {
     filmListsExtra[1].remove();
   } else {
+
     renderExtraFilmCard(commentsSortedFilms, filmListsExtra[1], onDataChange, onViewChange, moviesModel);
   }
 };
@@ -51,17 +57,22 @@ export default class PageController {
     this._filmModel = filmModel;
     this._api = api;
 
+
     this._nodesMain = Nodes.MAIN;
     this._filmsList = null;
     this._filmsListContainer = null;
 
     this._showedFilmControllers = [];
+
     this._showingFilmsCount = Count.SHOWING_CARDS_ON_START;
+
     this._sortingComponent = new SortingComponent();
     this._showMoreButtonComponent = new ShowMoreButtonComponent();
     this._extraListComponents = null;
 
+
     bindAll(this, [`_onDataChange`, `_onSortTypeChange`, `_onViewChange`, `_onFilterChange`, `showMoreButtonClickHandler`]);
+
 
     this._sortingComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     this._filmModel.setFilterChangeHandler(this._onFilterChange);
@@ -89,6 +100,7 @@ export default class PageController {
       const cardsOnStart = filmCards.slice(0, this._showingFilmsCount);
       renderHtmlPart(this._filmsListContainer, createFilmCardFragment(cardsOnStart, this._onDataChange, this._onViewChange, this._filmModel), RenderPosition.BEFOREEND);
       this._renderShowMoreButton();
+
 
       renderHtmlPart(this._container.getElement(), createFragment([new ExtraListComponent(ExtraTitles.TOP_RATED).getElement(), new ExtraListComponent(ExtraTitles.MOST_COMMENTED).getElement()]), RenderPosition.BEFOREEND);
       renderFilmListExtra(this._container.getElement(), filmCards, this._onDataChange, this._onViewChange, this._filmModel);
@@ -129,10 +141,12 @@ export default class PageController {
     remove(this._showMoreButtonComponent);
 
     if (this._showingFilmsCount >= this._filmModel.getMovies().length) {
+
       return;
     }
 
     renderHtmlPart(this._filmsList, this._showMoreButtonComponent.getElement(), RenderPosition.BEFOREEND);
+
 
     this._showMoreButtonComponent.setClickHandler(this.showMoreButtonClickHandler);
   }
@@ -168,6 +182,7 @@ export default class PageController {
     this._removeCards();
     this._renderCards(sortedFilms);
 
+
     if (sortType === SortType.DEFAULT) {
       this._renderShowMoreButton();
     } else {
@@ -193,7 +208,9 @@ export default class PageController {
     this._showedFilmControllers.forEach((controller) => controller.setDefaultView());
   }
 
+
   _onFilterChange() {
     this._updateCards(Count.SHOWING_CARDS_ON_START);
   }
+
 }

@@ -1,3 +1,4 @@
+
 const NAMES = [`Aaron`, `Adam`, `Aiden`, `Albert`, `Alex`, `Alexander`, `Alfie`, `Archie`, `Arthur`, `Austin`, `Benjamin`, `Blake`, `Bobby`];
 
 const FilterName = {
@@ -10,12 +11,14 @@ const FilterName = {
 
 const FILTER_MAX_VALUE = 20;
 
+
 const Nodes = {
   BODY: document.querySelector(`body`),
   HEADER: document.querySelector(`.header`),
   MAIN: document.querySelector(`.main`),
   FOOTER_STATISTIC: document.querySelector(`.footer__statistics p`)
 };
+
 
 const generateExceptionsFiltersCount = (item) => {
   if (item.includes(FilterName.ALL) || item.includes(FilterName.STATS)) {
@@ -36,6 +39,7 @@ const generateFilters = () => {
   });
 };
 
+
 const ExtraTitles = {
   TOP_RATED: `Top rated`,
   MOST_COMMENTED: `Most commented`
@@ -49,8 +53,10 @@ const GenreIndex = {
 
 const SortType = {
   DEFAULT: `default`,
+
   DATE: `releaseDate`,
   RATING: `totalRating`,
+
   COMMENTS: `comments`
 };
 
@@ -68,8 +74,10 @@ const RenderPosition = {
 };
 
 const KeyCode = {
+
   ESC: 27,
   ENTER: 13
+
 };
 
 const Mode = {
@@ -77,4 +85,6 @@ const Mode = {
   POPUP: `popup`,
 };
 
+
 export {NAMES, GenreIndex, Nodes, generateFilters, ExtraTitles, SortType, Count, KeyCode, RenderPosition, Mode, FilterName};
+

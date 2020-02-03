@@ -1,4 +1,5 @@
 import moment from 'moment';
+
 import he from 'he';
 import AbstractSmartComponent from './abstract-smart-component.js';
 import MovieModel from '../models/movie';
@@ -29,16 +30,19 @@ const generateFilmDetailsControls = (filmDetailsControls) => {
 
 const generateRating = (userRating) => {
   const userRatingMenu = [];
+
   for (let i = 1; i <= popupRatingLength; i++) {
     userRatingMenu.push(
         `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${i}" id="rating-${i}"${Number(userRating) === (i) ? ` checked` : ``}>
          <label class="film-details__user-rating-label" for="rating-${i}">${i}</label>`
+
     );
   }
   return userRatingMenu.join(`\n`);
 };
 
 const generateSelfFilmRating = (isWatched, title, poster, userRating) => {
+
   if (!isWatched) {
     return ``;
   }
@@ -66,6 +70,7 @@ const generateSelfFilmRating = (isWatched, title, poster, userRating) => {
         </div>
       </section>
     </div>`
+
   );
 };
 
@@ -87,6 +92,7 @@ const generateUserRatingLabel = (isWatched, userRating) => {
   }
   return ``;
 };
+
 
 const generateComment = (comments) => {
   return comments.map((comment) => {
@@ -134,6 +140,7 @@ const createFilmPopupTemplate = (data) => {
   };
   const popupFilmsDetailsRow = objKeysUppercaseFirstLetter(FilmsDetailsRow);
 
+
   const FilmDetailsControls = {
     WATCHLIST: [`Add to watchlist`, isWatchlist],
     WATCHED: [`Already watched`, isWatched],
@@ -141,6 +148,7 @@ const createFilmPopupTemplate = (data) => {
   };
 
   return (
+
     `<form class="film-details__inner" action="" method="get">
       <div class="form-details__top-container">
         <div class="film-details__close">
@@ -229,6 +237,7 @@ const createFilmPopupTemplate = (data) => {
         </section>
       </div>
     </form>`
+
   );
 };
 
@@ -238,7 +247,9 @@ export default class FilmPopup extends AbstractSmartComponent {
     this._data = data;
     this._onDataChange = onDataChange;
 
+
     this._handler = null;
+
 
     bindAll(this, [`recoverListeners`, `_subscribeOnEvents`, `watchlistControlClickHandler`, `favoriteControlClickHandler`, `watchedControlClickHandler`, `userRatingScoreClickHandler`, `emojiClickHandler`, `commentChangeHandler`, `deleteClickHandler`]);
   }
@@ -251,8 +262,10 @@ export default class FilmPopup extends AbstractSmartComponent {
     this._subscribeOnEvents();
   }
 
+
   getData() {
     return this._data;
+
   }
 
   _subscribeOnEvents() {
@@ -269,8 +282,10 @@ export default class FilmPopup extends AbstractSmartComponent {
         .addEventListener(`click`, this.userRatingScoreClickHandler);
     }
 
+
     element.querySelector(`.film-details__emoji-list`)
     .addEventListener(`click`, this.emojiClickHandler);
+
 
     element.querySelector(`.film-details__control-label--favorite`)
       .addEventListener(`click`, this.favoriteControlClickHandler);
@@ -287,16 +302,20 @@ export default class FilmPopup extends AbstractSmartComponent {
 
   setClickHandler(handler) {
     this._handler = handler;
+
     this.getElement().querySelector(`.film-details__close-btn`)
     .addEventListener(`click`, handler);
   }
 
   removeClickHandler(handler) {
+
     delete this._data.userEmoji;
     delete this._data.userComment;
+
     this.getElement().querySelector(`.film-details__close-btn`)
     .removeEventListener(`click`, handler);
   }
+
 
   deleteClickHandler(evt) {
     evt.preventDefault();
@@ -356,4 +375,5 @@ export default class FilmPopup extends AbstractSmartComponent {
       this.rerender();
     }
   }
+
 }
