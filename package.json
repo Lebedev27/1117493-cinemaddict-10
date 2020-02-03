@@ -4,14 +4,24 @@
   "private": true,
   "description": "Личный проект «Киноман» от HTML Academy",
   "scripts": {
+    "build": "webpack",
+    "start": "webpack-dev-server --open",
     "eslint": "eslint src/**/*.js",
     "test": "npm run eslint"
   },
   "devDependencies": {
     "eslint": "6.1.0",
-    "eslint-config-htmlacademy": "0.5.2"
+    "eslint-config-htmlacademy": "0.5.2",
+    "webpack": "4.41.2",
+    "webpack-cli": "3.3.10",
+    "webpack-dev-server": "3.9.0"
   },
   "engines": {
     "node": "10"
+  },
+  "dependencies": {
+    "he": "^1.2.0",
+    "moment": "^2.24.0",
+    "moment-locales-webpack-plugin": "^1.1.2"
   }
 }
