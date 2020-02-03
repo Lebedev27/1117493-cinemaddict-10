@@ -8,11 +8,19 @@ const getRandomArrayItem = (array) => {
   return array[randomIndex];
 };
 
-const sortingFilms = (data, type) => {
+
+const sortingFilms = (data, type, reverse) => {
   const newData = data.slice();
-  newData.sort((a, b) => {
-    return b[type] - a[type];
-  });
+  if (reverse) {
+    newData.sort((a, b) => {
+      return a[type] - b[type];
+    });
+  } else {
+    newData.sort((a, b) => {
+      return b[type] - a[type];
+    });
+  }
+
   return newData;
 };
 
