@@ -66,29 +66,7 @@ export default class MovieController {
       renderHtmlPart(Nodes.BODY, this._filmCardPopupComponent.getElement(), RenderPosition.BEFOREEND);
 
       this._filmCardPopupComponent.setClickHandler(this._removePopupCkickHandler);
-
-      this._filmCardPopupComponent.recoveryListeners();
-
-      // this._filmCardPopupComponent.setWatchListButtonClickHandler(() => {
-      //   this._onDataChange(this, this._cardData, Object.assign({}, this._cardData, {
-      //     isWatchList: !this._cardData.isWatchList,
-      //   }));
-      //   this._filmCardPopupComponent.rerender();
-      // });
-
-      // this._filmCardPopupComponent.setWatchedButtonClickHandler(() => {
-      //   this._onDataChange(this, this._cardData, Object.assign({}, this._cardData, {
-      //     isWatched: !this._cardData.isWatched,
-      //   }));
-      //   this._filmCardPopupComponent.rerender();
-      // });
-
-      // this._filmCardPopupComponent.setFavoritesButtonClickHandler(() => {
-      //   this._onDataChange(this, this._cardData, Object.assign({}, this._cardData, {
-      //     isFavorite: !this._cardData.isFavorite,
-      //   }));
-      //   this._filmCardPopupComponent.rerender();
-      // });
+      this._filmCardPopupComponent.recoverListeners();
 
       document.addEventListener(`keydown`, this._removePopupKeydownHandler);
       this._mode = Mode.POPUP;
