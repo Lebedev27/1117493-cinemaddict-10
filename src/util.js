@@ -1,3 +1,5 @@
+import {RenderPosition} from './constants.js';
+
 const getRandomBetween = (min, max) => {
   return Math.floor(Math.random() * (max - min) + min);
 };
@@ -14,4 +16,15 @@ const createElement = (template) => {
   return newElement.firstChild;
 };
 
-export {getRandomBetween, getRandomArrayItem, createElement};
+const renderHtmlPart = (container, template, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(template);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(template);
+      break;
+  }
+};
+
+export {getRandomBetween, getRandomArrayItem, createElement, renderHtmlPart};
