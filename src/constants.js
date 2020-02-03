@@ -10,9 +10,11 @@ const ExtraTitles = {
   MOST_COMMENTED: `Most commented`
 };
 
-const TypeOfSorting = {
-  rating: `rating`,
-  comments: `comments`
+const SortType = {
+  DEFAULT: `default`,
+  DATE: `year`,
+  RATING: `rating`,
+  COMMENTS: `comments`
 };
 
 const Count = {
@@ -23,8 +25,13 @@ const Count = {
   EXTRA_FILMS: 2
 };
 
+const RenderPosition = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`
+};
+
 const KeyCode = {
   ESC: 27
 };
 
-export {Nodes, ExtraTitles, TypeOfSorting, Count, KeyCode};
+export {Nodes, ExtraTitles, SortType, Count, KeyCode, RenderPosition};
