@@ -60,6 +60,11 @@ export default class Movies {
   setComments(cards) {
     this._filmsComments = Array.from(cards);
   }
+
+  updateComments(id, comments) {
+    this._filmsComments[id] = comments;
+  }
+
   getComments() {
     return this._filmsComments;
   }
@@ -70,10 +75,8 @@ export default class Movies {
     if (index === -1) {
       return false;
     }
-
     this._movies = [].concat(this._movies.slice(0, index), movie, this._movies.slice(index + 1));
     this._dataChangeHandlers.forEach((handler) => handler());
-
     return true;
   }
 

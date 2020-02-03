@@ -24,10 +24,18 @@ export default class Movie {
     this.isFavorite = Boolean(data[`user_details`][`favorite`]);
   }
 
+  getCommentsId() {
+
+    if (typeof this.comments[0] === `object`) {
+      return this.comments.map((comment) => comment.id);
+    }
+    return this.comments;
+  }
+
   toRAW() {
     return {
       'id': this.id,
-      'comments': this.comments,
+      'comments': this.getCommentsId(),
       'film_info': {
         'title': this.title,
         'alternative_title': this.alternativeTitle,

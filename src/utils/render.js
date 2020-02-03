@@ -30,7 +30,6 @@ const remove = (component) => {
   component.clearElement();
 };
 
-
 const replace = (newComponent, oldComponent) => {
   const parentElement = oldComponent.getElement().parentElement;
   const newElement = newComponent.getElement();
@@ -44,4 +43,3 @@ const replace = (newComponent, oldComponent) => {
 };
 
 export {RenderPosition, createElement, renderHtmlPart, createFragment, remove, replace};
-

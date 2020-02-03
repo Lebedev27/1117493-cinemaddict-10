@@ -2,7 +2,6 @@ import API from './api.js';
 import {Nodes, RenderPosition} from './constants.js';
 import {renderHtmlPart} from './utils/render.js';
 import ProfileStatusComponent from './components/profile-status.js';
-
 import FilterController from './controllers/filter.js';
 import FilmListComponent from './components/film-list.js';
 import FilmListTitleComponent from './components/film-list-title.js';
@@ -31,7 +30,6 @@ const showStatisticHandler = (pageController, statisticsComponent) => {
 // const cardsData = generateFilmCardsData(Count.CARD);
 const moviesModel = new MoviesModel();
 // moviesModel.setMovies(cardsData);
-
 
 const pasteElements = () => {
   const api = new API(END_POINT, AUTHORIZATION);

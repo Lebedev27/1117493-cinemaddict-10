@@ -17,7 +17,6 @@ const sortFilms = (data, type, flag) => {
   } else {
     newData.sort((a, b) => b[type] - a[type]);
   }
-
   return newData;
 };
 

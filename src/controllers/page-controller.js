@@ -1,24 +1,30 @@
 import {Nodes, Count, ExtraTitles, SortType} from '../constants.js';
 import {renderHtmlPart, RenderPosition, createFragment, remove} from '../utils/render.js';
-
 import {sortFilms} from '../utils/common.js';
-
 import SortingComponent from '../components/sorting.js';
 import MovieController from '../controllers/movie-сontroller.js';
 import ShowMoreButtonComponent from '../components/show-more-button.js';
 import ExtraListComponent from '../components/extra-list.js';
 import {bindAll} from '../utils/common.js';
 
-// const createFilmCardFragment = (cardsData, onDataChange, onViewChange, moviesModel) => {
-const createFilmCardFragment = (cardsData, onDataChange, onViewChange) => {
+const createFilmCardFragment = (cardsData, onDataChange, onViewChange, moviesModel) => {
+
+  let comments;
+
   const fragment = document.createDocumentFragment();
-  // const comments = moviesModel.getComments();
+
+  if (typeof cardsData[0].comments[0] === `string`) {
+    comments = moviesModel.getComments();
+  }
   cardsData.forEach((filmData) => {
-    // filmData.comments = comments[filmData[`id`]];
+
+    if (comments) {
+      filmData.comments = comments[filmData[`id`]];
+    }
+
     const movieController = new MovieController(fragment, onDataChange, onViewChange);
 
     movieController.render(filmData);
-
   });
   return fragment;
 };
@@ -27,11 +33,9 @@ const renderExtraFilmCard = (data, node, onDataChange, onViewChange, moviesModel
   renderHtmlPart(node.querySelector(`.films-list__container`), createFilmCardFragment(data, onDataChange, onViewChange, moviesModel), RenderPosition.BEFOREEND);
 };
 
-
 const renderFilmListExtra = (node, data, onDataChange, onViewChange, moviesModel) => {
   const ratingSortedFilms = sortFilms(data, SortType.RATING).slice(0, Count.EXTRA_FILMS);
   const commentsSortedFilms = sortFilms(data, SortType.COMMENTS, `length`).slice(0, Count.EXTRA_FILMS);
-
 
   const isFilmsUnRated = ratingSortedFilms.every((film) => film.totalRating === 0);
   const isFilmsUnComment = ratingSortedFilms.every((comment) => comment.comments === 0);
@@ -46,7 +50,6 @@ const renderFilmListExtra = (node, data, onDataChange, onViewChange, moviesModel
   if (isFilmsUnComment) {
     filmListsExtra[1].remove();
   } else {
-
     renderExtraFilmCard(commentsSortedFilms, filmListsExtra[1], onDataChange, onViewChange, moviesModel);
   }
 };
@@ -57,22 +60,17 @@ export default class PageController {
     this._filmModel = filmModel;
     this._api = api;
 
-
     this._nodesMain = Nodes.MAIN;
     this._filmsList = null;
     this._filmsListContainer = null;
 
     this._showedFilmControllers = [];
-
     this._showingFilmsCount = Count.SHOWING_CARDS_ON_START;
-
     this._sortingComponent = new SortingComponent();
     this._showMoreButtonComponent = new ShowMoreButtonComponent();
     this._extraListComponents = null;
 
-
     bindAll(this, [`_onDataChange`, `_onSortTypeChange`, `_onViewChange`, `_onFilterChange`, `showMoreButtonClickHandler`]);
-
 
     this._sortingComponent.setSortTypeChangeHandler(this._onSortTypeChange);
     this._filmModel.setFilterChangeHandler(this._onFilterChange);
@@ -101,7 +99,6 @@ export default class PageController {
       renderHtmlPart(this._filmsListContainer, createFilmCardFragment(cardsOnStart, this._onDataChange, this._onViewChange, this._filmModel), RenderPosition.BEFOREEND);
       this._renderShowMoreButton();
 
-
       renderHtmlPart(this._container.getElement(), createFragment([new ExtraListComponent(ExtraTitles.TOP_RATED).getElement(), new ExtraListComponent(ExtraTitles.MOST_COMMENTED).getElement()]), RenderPosition.BEFOREEND);
       renderFilmListExtra(this._container.getElement(), filmCards, this._onDataChange, this._onViewChange, this._filmModel);
 
@@ -120,7 +117,7 @@ export default class PageController {
     this._showedFilmControllers = this._filmsListContainer.querySelectorAll(`.film-card`);
     renderHtmlPart(this._container.getElement(), createFragment([new ExtraListComponent(ExtraTitles.TOP_RATED).getElement(), new ExtraListComponent(ExtraTitles.MOST_COMMENTED).getElement()]), RenderPosition.BEFOREEND);
 
-    renderFilmListExtra(this._container.getElement(), this._filmModel.getMovies(), this._onDataChange, this._onViewChange, this._filmModel);
+    renderFilmListExtra(this._container.getElement(), films, this._onDataChange, this._onViewChange, this._filmModel);
     this._showingFilmsCount = this._showedFilmControllers.length;
     this._extraListComponents = this._container.getElement().querySelectorAll(`.films-list--extra`);
   }
@@ -141,12 +138,10 @@ export default class PageController {
     remove(this._showMoreButtonComponent);
 
     if (this._showingFilmsCount >= this._filmModel.getMovies().length) {
-
       return;
     }
 
     renderHtmlPart(this._filmsList, this._showMoreButtonComponent.getElement(), RenderPosition.BEFOREEND);
-
 
     this._showMoreButtonComponent.setClickHandler(this.showMoreButtonClickHandler);
   }
@@ -159,7 +154,7 @@ export default class PageController {
 
     renderHtmlPart(this._filmsListContainer, createFilmCardFragment(unrenderedCards, this._onDataChange, this._onViewChange, this._filmModel), RenderPosition.BEFOREEND);
 
-    if (this._showingFilmsCount >= this._filmModel.getMoviesAll().length) {
+    if (this._showingFilmsCount >= this._filmModel.getMovies().length) {
       remove(this._showMoreButtonComponent);
       this._showMoreButtonComponent.removeClickHandler(this.showMoreButtonClickHandler);
     }
@@ -182,7 +177,6 @@ export default class PageController {
     this._removeCards();
     this._renderCards(sortedFilms);
 
-
     if (sortType === SortType.DEFAULT) {
       this._renderShowMoreButton();
     } else {
@@ -190,27 +184,55 @@ export default class PageController {
     }
   }
 
-  _onDataChange(oldData, newData, cb) {
-    this._api.updateFilm(oldData.id, newData)
-      .then((filmModel) => {
-        const isSuccess = this._filmModel.updateMovie(oldData.id, filmModel);
+  _onDataChange(oldData, newData, filmPopup, newComment, deleteCommentId, newDataFromPopup) {
+    if (newComment) {
+      this._api.addComment(oldData.id, newComment)
+        .then((filmModel) => this._updateCommentsData(filmModel, filmPopup))
+        .catch(() => {
+          filmPopup.removeCommentStyles();
+          filmPopup.shake(filmPopup.getElement().querySelector(`.film-details__comment-input`));
+        });
+    } else if (deleteCommentId) {
+      this._api.deleteComment(deleteCommentId)
+        .then(this._updateCommentsData(newDataFromPopup, filmPopup));
+    } else {
+      this._api.updateFilm(oldData.id, newData)
+        .then((filmModel) => {
+          const isSuccess = this._filmModel.updateMovie(oldData.id, filmModel);
 
-        if (isSuccess) {
-          this._updateCards(this._showingFilmsCount);
-          if (cb !== undefined) {
-            cb(newData);
+          if (isSuccess) {
+            this._updateCards(this._showingFilmsCount);
+            if (filmPopup) {
+              filmPopup.rerender(filmModel);
+            }
           }
-        }
-      });
+        })
+        .catch(() => {
+          if (filmPopup.clickedRatingIcon) {
+            filmPopup.shake(filmPopup.getElement().querySelector(`.film-details__user-score`));
+            filmPopup.removeRatingStyles();
+          }
+        });
+    }
   }
 
   _onViewChange() {
     this._showedFilmControllers.forEach((controller) => controller.setDefaultView());
   }
 
-
   _onFilterChange() {
     this._updateCards(Count.SHOWING_CARDS_ON_START);
   }
 
+  _updateCommentsData(data, filmPopup) {
+    const isSuccess = this._filmModel.updateMovie(data.id, data);
+
+    if (isSuccess) {
+      this._updateCards(this._showingFilmsCount);
+      this._filmModel.updateComments(data.id, data.comments);
+      if (filmPopup) {
+        filmPopup.rerender(data);
+      }
+    }
+  }
 }

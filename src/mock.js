@@ -1,18 +1,14 @@
-
 import moment from 'moment';
 import {NAMES} from './constants.js';
 import {getRandomBetween, getRandomArrayItem, sortFilms, getRandomDate} from './utils/common.js';
-
 
 const SENTENCE = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.`;
 const FILMS = [`The Shawshank Redemption`, `The Godfather`, `The Dark Knight`, `Schindler's List`, `The Lord of the Rings: The Return of the King`, `Pulp Fiction`, `Fight Club`, `Forrest Gump`, `Inception`, `Matrix`, `Goodfellas`, `Se7en`, `Star Wars`, `Sen to Chihiro no kamikakushi`, `Interstellar`];
 const IMAGES = [`made-for-each-other.png`, `popeye-meets-sinbad.png`, `sagebrush-trail.jpg`, `santa-claus-conquers-the-martians.jpg`, `the-dance-of-life.jpg`, `the-great-flamarion.jpg`, `the-man-with-the-golden-arm.jpg`];
 const COUNTRYES = [`Afghanistan`, `Albania`, `Algeria`, `Andorra`, `Angola`, `Argentina`, `Armenia`, `Australia`, `Austria`, `Azerbaijan`, `Bahrain`, `Bangladesh`];
-
 const GENRES = [`Action`, `Adventure`, `Comedy`, `Drama`, `Crime`, `Horror`, `Fantasy`, `Western`, `Thriller`, `Animation`];
 const emojiType = [`smile`, `sleeping`, `puke`, `angry`];
 let id = 0;
-
 
 const sentencesArray = SENTENCE.split(`.`);
 
@@ -27,14 +23,12 @@ const Months = new Confines(1, 12);
 const Day = new Confines(1, 30);
 const Hour = new Confines(0, 3);
 const Minutes = new Confines(0, 59);
-
 const SentencesQuantity = new Confines(1, 3);
 
 const getRandomRating = (min, max) => {
   return Math.round(Math.random() * (max - min) + min) + Number(Math.random().toFixed(1));
 };
 
-<
 const generateDescription = (quantity) => {
   let description = [];
   for (let i = 0; i < quantity; i++) {
@@ -43,7 +37,6 @@ const generateDescription = (quantity) => {
   description = description.join(`. `);
   return description;
 };
-
 
 const generateComments = (count) => {
   const comments = [];
@@ -75,9 +68,7 @@ const generateFilmCardData = () => {
     director: getRandomArrayItem(NAMES),
     writers: `${getRandomArrayItem(NAMES)}, ${getRandomArrayItem(NAMES)}, ${getRandomArrayItem(NAMES)}`,
     actors: `${getRandomArrayItem(NAMES)}, ${getRandomArrayItem(NAMES)}, ${getRandomArrayItem(NAMES)}`,
-
     releaseDate: date,
-
     country: getRandomArrayItem(COUNTRYES),
     isWatchList: Math.random() > 0.5,
     isWatched: isItWatched,
@@ -91,6 +82,5 @@ const generateFilmCardsData = (count) => {
     .fill(``)
     .map(generateFilmCardData);
 };
-
 
 export {generateFilmCardsData, NAMES};

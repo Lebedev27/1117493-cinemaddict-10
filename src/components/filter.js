@@ -1,12 +1,9 @@
 import AbstractComponent from './abstract-component.js';
-
 import {FilterName} from '../constants.js';
-
 
 const createCounter = (count) => count !== `` ? `<span class="main-navigation__item-count">${count}</span>` : ``;
 
 const createFilterMarkup = (filter) => {
-
   let {name, link, count, isActive} = filter;
   if (name === FilterName.ALL || name === FilterName.STATS) {
     count = ``;
@@ -14,9 +11,7 @@ const createFilterMarkup = (filter) => {
   const lowerLink = link.toLowerCase();
 
   return (
-
     `<a href="#${lowerLink}" id="${lowerLink}" class="main-navigation__item${isActive ? ` main-navigation__item--active` : ``}${name === FilterName.STATS ? ` main-navigation__item--additional` : ``}">${name}
-
     ${createCounter(count)}
     </a>`
   );
@@ -42,7 +37,6 @@ export default class Filter extends AbstractComponent {
     return createFilterTemplate(this._filters);
   }
 
-
   setFilterChangeHandler(handler) {
     this.getElement().addEventListener(`click`, (evt) => {
       evt.preventDefault();
@@ -53,9 +47,7 @@ export default class Filter extends AbstractComponent {
     });
   }
 
-
   setShowStatisticHandler(handler) {
     this.getElement().addEventListener(`click`, handler);
   }
-
 }

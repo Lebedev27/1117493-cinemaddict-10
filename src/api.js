@@ -1,4 +1,5 @@
 import Movie from './models/movie.js';
+import Comment from './models/comment.js';
 
 const Method = {
   GET: `GET`,
@@ -27,13 +28,21 @@ const API = class {
       .then(Movie.parseMovies);
   }
 
-  getComments(commentId) {
-    return this._load({url: `comments/${commentId}`})
+  getComments(id) {
+    return this._load({url: `comments/${id}`})
       .then((response) => response.json());
   }
 
-  // addComment(comment) {
-  // }
+  addComment(id, comment) {
+    return this._load({
+      url: `comments/${id}`,
+      method: Method.POST,
+      body: JSON.stringify(comment),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then((response) => response.json())
+      .then(Comment.parseComment);
+  }
 
   updateFilm(id, data) {
     return this._load({
@@ -46,8 +55,9 @@ const API = class {
       .then(Movie.parseMovie);
   }
 
-  // deleteComment(id) {
-  // }
+  deleteComment(commentId) {
+    return this._load({url: `comments/${commentId}`, method: Method.DELETE});
+  }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append(`Authorization`, this._authorization);
