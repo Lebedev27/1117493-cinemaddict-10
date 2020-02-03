@@ -20,8 +20,10 @@
     "node": "10"
   },
   "dependencies": {
+
     "he": "^1.2.0",
     "moment": "^2.24.0",
     "moment-locales-webpack-plugin": "^1.1.2"
+
   }
 }

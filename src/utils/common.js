@@ -8,6 +8,7 @@ const getRandomArrayItem = (array) => {
   return array[randomIndex];
 };
 
+
 const sortingFilms = (data, type, reverse) => {
   const newData = data.slice();
   if (reverse) {
@@ -19,6 +20,7 @@ const sortingFilms = (data, type, reverse) => {
       return b[type] - a[type];
     });
   }
+
   return newData;
 };
 

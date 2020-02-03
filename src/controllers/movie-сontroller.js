@@ -1,9 +1,11 @@
+
 import {Nodes, KeyCode, Mode, NAMES} from '../constants.js';
 import {renderHtmlPart, RenderPosition, remove} from '../utils/render.js';
 import {getRandomArrayItem} from '../utils/common.js';
 import FilmCardComponent from '../components/film-card.js';
 import FilmPopupComponent from '../components/film-popup.js';
 import FilmPopupBgComponent from '../components/film-popup-bg.js';
+
 
 export default class MovieController {
   constructor(container, onDataChange, onViewChange) {
@@ -16,6 +18,7 @@ export default class MovieController {
     this._mode = Mode.DEFAULT;
 
     this._filmCardComponent = null;
+
     this._filmCardPopupBgComponent = null;
     this._filmCardPopupComponent = null;
 
@@ -26,11 +29,13 @@ export default class MovieController {
     this.watchedButtonClickHandler = this.watchedButtonClickHandler.bind(this);
     this.favoritesButtonClickHandler = this.favoritesButtonClickHandler.bind(this);
     this.submitCommentKeydownHandler = this.submitCommentKeydownHandler.bind(this);
+
   }
 
   render(filmCardData) {
     this._cardData = filmCardData;
     this._filmCardComponent = new FilmCardComponent(this._cardData);
+
     this._filmCardPopupBgComponent = new FilmPopupBgComponent(this._cardData);
     this._filmCardPopupComponent = new FilmPopupComponent(this._cardData);
 
@@ -38,6 +43,7 @@ export default class MovieController {
     this._filmCardComponent.setWatchListButtonClickHandler(this.watchListButtonClickHandler);
     this._filmCardComponent.setWatchedButtonClickHandler(this.watchedButtonClickHandler);
     this._filmCardComponent.setFavoritesButtonClickHandler(this.favoritesButtonClickHandler);
+
 
     this._container.appendChild(this._filmCardComponent.getElement());
   }
@@ -48,12 +54,15 @@ export default class MovieController {
     }
   }
 
+
   _cardClickHandler(evt) {
+
     const filmTitle = this._filmCardComponent.getElement().querySelector(`h3`);
     const filmImage = this._filmCardComponent.getElement().querySelector(`img`);
     const filmComments = this._filmCardComponent.getElement().querySelector(`a`);
 
     if ([filmTitle, filmImage, filmComments].includes(evt.target)) {
+
       const filmCardPopupBg = this._filmCardPopupBgComponent.getElement();
 
       renderHtmlPart(Nodes.BODY, filmCardPopupBg, RenderPosition.BEFOREEND);
@@ -64,9 +73,11 @@ export default class MovieController {
       document.addEventListener(`keydown`, this._removePopupKeydownHandler);
       document.addEventListener(`keydown`, this.submitCommentKeydownHandler);
 
+
       this._mode = Mode.POPUP;
     }
   }
+
 
   watchListButtonClickHandler(evt) {
     evt.preventDefault();
@@ -116,6 +127,7 @@ export default class MovieController {
       this._onDataChange(this._cardData, Object.assign({}, this._cardData, this._filmCardPopupComponent.getData()));
       remove(this._filmCardPopupComponent);
       remove(this._filmCardPopupBgComponent);
+
     }
   }
 

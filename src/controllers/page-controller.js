@@ -1,16 +1,20 @@
 import {Nodes, Count, ExtraTitles, SortType} from '../constants.js';
 import {renderHtmlPart, RenderPosition, createFragment, remove} from '../utils/render.js';
 import {sortingFilms} from '../utils/common.js';
+
+
 import SortingComponent from '../components/sorting.js';
 import MovieController from '../controllers/movie-сontroller.js';
 import ShowMoreButtonComponent from '../components/show-more-button.js';
 import ExtraListComponent from '../components/extra-list.js';
+
 
 const createFilmCardFragment = (cardsData, onDataChange, onViewChange) => {
   const fragment = document.createDocumentFragment();
   cardsData.forEach((filmData) => {
     const movieController = new MovieController(fragment, onDataChange, onViewChange);
     movieController.render(filmData);
+
   });
   return fragment;
 };
@@ -19,7 +23,9 @@ const renderExtraFilmCard = (data, node, onDataChange, onViewChange) => {
   renderHtmlPart(node.querySelector(`.films-list__container`), createFilmCardFragment(data, onDataChange, onViewChange), RenderPosition.BEFOREEND);
 };
 
+
 const renderFilmListExtra = (node, data, onDataChange, onViewChange) => {
+
   const ratingSortedFilms = sortingFilms(data, SortType.RATING).slice(0, Count.EXTRA_FILMS);
   const commentsSortedFilms = sortingFilms(data, SortType.COMMENTS).slice(0, Count.EXTRA_FILMS);
 
@@ -31,32 +37,41 @@ const renderFilmListExtra = (node, data, onDataChange, onViewChange) => {
   if (isFilmsUnRated) {
     filmListsExtra[0].remove();
   } else {
+
     renderExtraFilmCard(ratingSortedFilms, filmListsExtra[0], onDataChange, onViewChange);
+
   }
   if (isFilmsUnComment) {
     filmListsExtra[1].remove();
   } else {
+
     renderExtraFilmCard(commentsSortedFilms, filmListsExtra[1], onDataChange, onViewChange);
+
   }
 };
 
 export default class PageController {
+
   constructor(container, filmModel) {
     this._container = container;
     this._filmModel = filmModel;
+
 
     this._nodesMain = Nodes.MAIN;
     this._filmsList = null;
     this._filmsListContainer = null;
 
     this._showedFilmControllers = [];
+
     this._showingFilmsCount = Count.SHOWING_CARDS_ON_START;
+
     this._sortingComponent = new SortingComponent();
     this._showMoreButtonComponent = new ShowMoreButtonComponent();
 
     this._onDataChange = this._onDataChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
+
     this._onFilterChange = this._onFilterChange.bind(this);
     this.showMoreButtonClickHandler = this.showMoreButtonClickHandler.bind(this);
 
@@ -74,10 +89,12 @@ export default class PageController {
       this._filmsListContainer = this._container.querySelector(`.films-list__container`);
 
       const cardsOnStart = filmCards.slice(0, this._showingFilmsCount);
+
       renderHtmlPart(this._filmsListContainer, createFilmCardFragment(cardsOnStart, this._onDataChange, this._onViewChange), RenderPosition.BEFOREEND);
       this._renderShowMoreButton();
 
       renderHtmlPart(this._container, createFragment([new ExtraListComponent(ExtraTitles.TOP_RATED).getElement(), new ExtraListComponent(ExtraTitles.MOST_COMMENTED).getElement()]), RenderPosition.BEFOREEND);
+
       renderFilmListExtra(this._container, filmCards, this._onDataChange, this._onViewChange);
     }
   }
@@ -103,10 +120,12 @@ export default class PageController {
     remove(this._showMoreButtonComponent);
 
     if (this._showingFilmsCount >= this._filmModel.getMovies().length) {
+
       return;
     }
 
     renderHtmlPart(this._filmsList, this._showMoreButtonComponent.getElement(), RenderPosition.BEFOREEND);
+
 
     this._showMoreButtonComponent.setClickHandler(this.showMoreButtonClickHandler);
   }
@@ -142,6 +161,7 @@ export default class PageController {
     this._removeCards();
     this._renderCards(sortedFilms);
 
+
     if (sortType === SortType.DEFAULT) {
       this._renderShowMoreButton();
     } else {
@@ -149,19 +169,23 @@ export default class PageController {
     }
   }
 
+
   _onDataChange(oldData, newData) {
     const isSuccess = this._filmModel.updateMovie(oldData.id, newData);
 
     if (isSuccess) {
       this._updateCards(this._showingFilmsCount);
     }
+
   }
 
   _onViewChange() {
     this._showedFilmControllers.forEach((controller) => controller.setDefaultView());
   }
 
+
   _onFilterChange() {
     this._updateCards(Count.SHOWING_CARDS_ON_START);
   }
+
 }
