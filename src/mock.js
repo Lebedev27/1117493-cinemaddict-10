@@ -5,7 +5,7 @@ const SENTENCE = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras 
 const FILMS = [`The Shawshank Redemption`, `The Godfather`, `The Dark Knight`, `Schindler's List`, `The Lord of the Rings: The Return of the King`, `Pulp Fiction`, `Fight Club`, `Forrest Gump`, `Inception`, `Matrix`, `Goodfellas`, `Se7en`, `Star Wars`, `Sen to Chihiro no kamikakushi`, `Interstellar`];
 const IMAGES = [`made-for-each-other.png`, `popeye-meets-sinbad.png`, `sagebrush-trail.jpg`, `santa-claus-conquers-the-martians.jpg`, `the-dance-of-life.jpg`, `the-great-flamarion.jpg`, `the-man-with-the-golden-arm.jpg`];
 const MONTHS = [`January`, `February`, `March`, `April`, `May`, `June`, `July`, `August`, `September`, `October`, `November`, `December`];
-const COUNTRYES = [`Afghanistan`, `Albania`, `Algeria`, `Andorra`, `Angola`, `Argentina`, `Armenia`, `Australia`, `Austria`, `Azerbaijan`, `Bahrain`, `Bangladesh`]
+const COUNTRYES = [`Afghanistan`, `Albania`, `Algeria`, `Andorra`, `Angola`, `Argentina`, `Armenia`, `Australia`, `Austria`, `Azerbaijan`, `Bahrain`, `Bangladesh`];
 const NAMES = [`AARON`, `ADAM`, `AIDEN`, `ALBERT`, `ALEX`, `ALEXANDER`, `ALFIE`, `ARCHIE`, `ARTHUR`, `AUSTIN`, `BENJAMIN`, `BLAKE`, `BOBBY`];
 const GENRES = [`Action`, `Adventure`, `Comedy`, `Drama`, `Crime`, `Horror`, `Fantasy`, `Western`, `Thriller`, `Animation`];
 const FILTER_MAX_VALUE = 20;
@@ -72,7 +72,7 @@ const generateFilmCardData = () => {
     writers: `${getRandomArrayItem(NAMES)}, ${getRandomArrayItem(NAMES)}, ${getRandomArrayItem(NAMES)}`,
     actors: `${getRandomArrayItem(NAMES)}, ${getRandomArrayItem(NAMES)}, ${getRandomArrayItem(NAMES)}`,
     releaseDate: `${getRandomBetween(Day.min, Day.max)} ${getRandomArrayItem(MONTHS)} ${productionYear}`,
-    counry: getRandomArrayItem(COUNTRYES)
+    country: getRandomArrayItem(COUNTRYES)
   };
 };
 
