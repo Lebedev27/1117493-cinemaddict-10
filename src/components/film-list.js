@@ -1,4 +1,4 @@
-import {createElement} from '../util.js';
+import AbstractComponent from './abstract-component.js';
 
 const generateFilmListContainer = (data) => data.length > 0 ? `<div class="films-list__container"></div>` : ``;
 
@@ -13,25 +13,13 @@ const createFilmListTemplate = (data) => {
   );
 };
 
-export default class FilmList {
+export default class FilmList extends AbstractComponent {
   constructor(data) {
+    super();
     this._data = data;
-    this._element = null;
   }
 
   getTemplate() {
     return createFilmListTemplate(this._data);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

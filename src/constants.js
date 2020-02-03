@@ -1,3 +1,10 @@
+const Nodes = {
+  BODY: document.querySelector(`body`),
+  HEADER: document.querySelector(`.header`),
+  MAIN: document.querySelector(`.main`),
+  FOOTER_STATISTIC: document.querySelector(`.footer__statistics p`)
+};
+
 const ExtraTitles = {
   TOP_RATED: `Top rated`,
   MOST_COMMENTED: `Most commented`
@@ -6,11 +13,6 @@ const ExtraTitles = {
 const TypeOfSorting = {
   rating: `rating`,
   comments: `comments`
-};
-
-const RenderPosition = {
-  AFTERBEGIN: `afterbegin`,
-  BEFOREEND: `beforeend`
 };
 
 const Count = {
@@ -25,4 +27,4 @@ const KeyCode = {
   ESC: 27
 };
 
-export {ExtraTitles, TypeOfSorting, RenderPosition, Count, KeyCode};
+export {Nodes, ExtraTitles, TypeOfSorting, Count, KeyCode};
