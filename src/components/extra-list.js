@@ -1,6 +1,4 @@
-import {createElement} from '../util.js';
-
-// const EXTRA_TITLES = [`Top rated`, `Most commented`];
+import AbstractComponent from './abstract-component.js';
 
 const createExtraListMarkup = (title) => {
   return (
@@ -12,25 +10,13 @@ const createExtraListMarkup = (title) => {
   );
 };
 
-export default class ExtraList {
+export default class ExtraList extends AbstractComponent {
   constructor(title) {
+    super();
     this._title = title;
-    this._element = null;
   }
 
   getTemplate() {
     return createExtraListMarkup(this._title);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

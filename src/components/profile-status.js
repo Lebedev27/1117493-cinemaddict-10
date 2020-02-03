@@ -1,4 +1,5 @@
-import {getRandomBetween, createElement} from '../util.js';
+import AbstractComponent from './abstract-component.js';
+import {getRandomBetween} from '../utils/common.js';
 
 const userRanks = [``, `Novice`, `Fan`, `Movie Buff`];
 const devider = 10;
@@ -17,25 +18,13 @@ const createProfileStatusTemplate = (max) => {
   );
 };
 
-export default class ProfileStatus {
+export default class ProfileStatus extends AbstractComponent {
   constructor(max) {
+    super();
     this._max = max;
-    this._element = null;
   }
 
   getTemplate() {
     return createProfileStatusTemplate(this._max);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

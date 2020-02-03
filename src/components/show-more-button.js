@@ -1,4 +1,4 @@
-import {createElement} from '../util.js';
+import AbstractComponent from './abstract-component.js';
 
 const createShowMoreButtonTemplate = () => {
   return (
@@ -6,24 +6,15 @@ const createShowMoreButtonTemplate = () => {
   );
 };
 
-export default class ShowMoreButton {
-  constructor() {
-    this._element = null;
-  }
-
+export default class ShowMoreButton extends AbstractComponent {
   getTemplate() {
     return createShowMoreButtonTemplate();
   }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  setClickHandler(handler) {
+    this.getElement().addEventListener(`click`, handler);
   }
 
-  removeElement() {
-    this._element = null;
+  removeClickHandler(handler) {
+    this.getElement().removeEventListener(`click`, handler);
   }
 }
