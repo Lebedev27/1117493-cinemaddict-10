@@ -12,10 +12,6 @@ const createExtraListMarkup = (title) => {
   );
 };
 
-const createExtraListTemplate = (title) => {
-  return createExtraListMarkup(title);
-};
-
 export default class ExtraList {
   constructor(title) {
     this._title = title;
@@ -23,7 +19,7 @@ export default class ExtraList {
   }
 
   getTemplate() {
-    return createExtraListTemplate(this._title);
+    return createExtraListMarkup(this._title);
   }
 
   getElement() {
