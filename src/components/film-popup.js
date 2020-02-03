@@ -1,33 +1,90 @@
-import AbstractComponent from './abstract-component.js';
+import AbstractSmartComponent from './abstract-smart-component.js';
+import {remove} from '../utils/render.js';
 
-const generateFilmsDetailsRow = (obj) => {
-  let fragment = document.createDocumentFragment();
-  const arr = [];
-  for (const item of Object.keys(obj)) {
-    arr.push(
+
+const popupRatingLength = 9;
+
+const generateFilmsDetailsRow = (filmsDetailsRow) => {
+  const filmsDetailsRows = [];
+  for (const item of Object.keys(filmsDetailsRow)) {
+    filmsDetailsRows.push(
         `<tr class="film-details__row">
           <td class="film-details__term">${item}</td>
-          <td class="film-details__cell">${obj[item]}</td>
+          <td class="film-details__cell">${filmsDetailsRow[item]}</td>
         </tr>`);
   }
-  fragment = arr.join(`\n`);
-  return fragment;
+  return filmsDetailsRows.join(`\n`);
 };
 
-const generateFilmDetailsControls = (obj) => {
-  let fragment = document.createDocumentFragment();
-  const arr = [];
-  for (const item of Object.keys(obj)) {
-    arr.push(
-        `<input type="checkbox" class="film-details__control-input visually-hidden" id="${item}" name="${item}">
-        <label for="${item}" class="film-details__control-label film-details__control-label--${item}">${obj[item]}</label>`);
+const generateFilmDetailsControls = (filmDetailsControls) => {
+  const buttons = [];
+  for (const item of Object.keys(filmDetailsControls)) {
+    buttons.push(
+        `<input type="checkbox" class="film-details__control-input visually-hidden" id="${item.toLowerCase()}" name="${item.toLowerCase()}"${filmDetailsControls[item][1] ? ` checked` : ``}>
+        <label for="${item.toLowerCase()}" class="film-details__control-label film-details__control-label--${item.toLowerCase()}">${filmDetailsControls[item][0]}</label>`);
   }
-  fragment = arr.join(`\n`);
-  return fragment;
+  return buttons.join(`\n`);
+};
+
+const generateRating = (userRating) => {
+  const userRatingMenu = [];
+  for (let i = 0; i < popupRatingLength; i++) {
+    userRatingMenu.push(
+        `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${i + 1}" id="rating-${i + 1}"${Number(userRating) === (i + 1) ? ` checked` : ``}>
+          <label class="film-details__user-rating-label" for="rating-${i + 1}">${i + 1}</label>`
+    );
+  }
+  return userRatingMenu.join(`\n`);
+};
+
+const generateYourSelfFilmRating = (isWatched, title, image, userRating) => {
+  return (
+    isWatched ?
+      `<div class="form-details__middle-container">
+        <section class="film-details__user-rating-wrap">
+          <div class="film-details__user-rating-controls">
+            <button class="film-details__watched-reset" type="button">Undo</button>
+          </div>
+
+          <div class="film-details__user-score">
+            <div class="film-details__user-rating-poster">
+              <img src="./images/posters/${image}" alt="film-poster" class="film-details__user-rating-img">
+            </div>
+
+            <section class="film-details__user-rating-inner">
+              <h3 class="film-details__user-rating-title">${title}</h3>
+
+              <p class="film-details__user-rating-feelings">How you feel it?</p>
+
+              <div class="film-details__user-rating-score">
+                ${generateRating(userRating)}
+              </div>
+            </section>
+          </div>
+        </section>
+      </div>` : ``
+  );
+};
+
+const generateGenres = (genres) => {
+  const genresList = [];
+  for (const genre of genres) {
+    genresList.push(
+        `<span class="film-details__genre">${genre}</span>`
+    );
+  }
+  return genresList.join(`\n`);
+};
+
+const generateYserRatingLabel = (isWatched, userRating) => {
+  if (isWatched && userRating > 0) {
+    return `<p class="film-details__user-rating">Your rate ${userRating}</p>`;
+  }
+  return ``;
 };
 
 const createFilmPopupTemplate = (data) => {
-  const {title, image, rating, time, genre, description, comments, director, writers, actors, releaseDate, country} = data;
+  const {title, image, rating, time, genre, description, comments, director, writers, actors, releaseDate, country, isWatchList, isWatched, isFavorite, userRating} = data;
 
   const FilmsDetailsRow = {
     'Director': director,
@@ -38,10 +95,10 @@ const createFilmPopupTemplate = (data) => {
     'Country': country
   };
 
-  const filmDetailsControls = {
-    watchlist: `Add to watchlist`,
-    watched: `Already watched`,
-    favorite: `Add to favorites`
+  const FilmDetailsControls = {
+    WATCHLIST: [`Add to watchlist`, isWatchList],
+    WATCHED: [`Already watched`, isWatched],
+    FAVORITE: [`Add to favorites`, isFavorite]
   };
 
   return (
@@ -67,17 +124,17 @@ const createFilmPopupTemplate = (data) => {
 
                 <div class="film-details__rating">
                   <p class="film-details__total-rating">${rating}</p>
+                  ${generateYserRatingLabel(isWatched, userRating)}
                 </div>
               </div>
 
               <table class="film-details__table">
                 ${generateFilmsDetailsRow(FilmsDetailsRow)}
                 <tr class="film-details__row">
-                  <td class="film-details__term">Genres</td>
+                  <td class="film-details__term">${genre.length === 1 ? `Genre` : `Genres`}</td>
                   <td class="film-details__cell">
-                    <span class="film-details__genre">${genre[0]}</span>
-                    <span class="film-details__genre">${genre[1]}</span>
-                    <span class="film-details__genre">${genre[2]}</span></td>
+                    ${generateGenres(genre)}
+                  </td>
                 </tr>
               </table>
 
@@ -88,9 +145,11 @@ const createFilmPopupTemplate = (data) => {
           </div>
 
           <section class="film-details__controls">
-            ${generateFilmDetailsControls(filmDetailsControls)}
+            ${generateFilmDetailsControls(FilmDetailsControls)}
           </section>
         </div>
+
+        ${generateYourSelfFilmRating(isWatched, title, image, userRating)}
 
         <div class="form-details__bottom-container">
           <section class="film-details__comments-wrap">
@@ -136,21 +195,92 @@ const createFilmPopupTemplate = (data) => {
   );
 };
 
-export default class FilmPopup extends AbstractComponent {
+export default class FilmPopup extends AbstractSmartComponent {
   constructor(data) {
     super();
     this._data = data;
+
+    this.setWatchListButtonClickHandler = this.setClickHandler.bind(this);
+    this.setWatchedButtonClickHandler = this.setClickHandler.bind(this);
+    this.setFavoritesButtonClickHandler = this.setClickHandler.bind(this);
+    this.recoveryListeners = this.recoveryListeners.bind(this);
+    this._subscribeOnEvents = this._subscribeOnEvents.bind(this);
+    this._handler = this._handler.bind(this);
   }
 
   getTemplate() {
     return createFilmPopupTemplate(this._data);
   }
 
+  recoveryListeners() {
+    this._subscribeOnEvents();
+  }
+
+  _handler() {
+    if (this.getElement()) {
+      remove(this);
+      this.getElement().querySelector(`.film-details__close-btn`)
+        .removeEventListener(`click`, this._handler);
+      document.removeEventListener(`keydown`, this._handler);
+    }
+  }
+
+  _subscribeOnEvents() {
+    this.getElement().querySelector(`.film-details__control-label--watchlist`)
+      .addEventListener(`click`, () => {
+        this._data.isWatchList = !this._data.isWatchList;
+        this.rerender();
+      });
+
+    this.getElement().querySelector(`.film-details__control-label--watched`)
+      .addEventListener(`click`, () => {
+        this._data.isWatched = !this._data.isWatched;
+        this._data.userRating = `0`;
+        this.rerender();
+      });
+
+    if (this.getElement().querySelector(`.film-details__user-rating-score`)) {
+      this.getElement().querySelector(`.film-details__user-rating-score`)
+        .addEventListener(`click`, (evt) => {
+          if (evt.target.tagName === `LABEL`) {
+            this._data.userRating = evt.target.textContent;
+            this.rerender();
+          }
+        });
+    }
+
+    this.getElement().querySelector(`.film-details__control-label--favorite`)
+      .addEventListener(`click`, () => {
+        this._data.isFavorite = !this._data.isFavorite;
+        this.rerender();
+      });
+
+    this.getElement().querySelector(`.film-details__close-btn`)
+      .addEventListener(`click`, this._handler);
+  }
+
   setClickHandler(handler) {
-    this.getElement().querySelector(`.film-details__close-btn`).addEventListener(`click`, handler);
+    this.getElement().querySelector(`.film-details__close-btn`)
+    .addEventListener(`click`, handler);
   }
 
   removeClickHandler(handler) {
-    this.getElement().querySelector(`.film-details__close-btn`).removeEventListener(`click`, handler);
+    this.getElement().querySelector(`.film-details__close-btn`)
+    .removeEventListener(`click`, handler);
   }
+
+  // setWatchListButtonClickHandler(handler) {
+  //   this.getElement().querySelector(`.film-details__control-label--watchlist`)
+  //     .addEventListener(`click`, handler);
+  // }
+
+  // setWatchedButtonClickHandler(handler) {
+  //   this.getElement().querySelector(`.film-details__control-label--watched`)
+  //     .addEventListener(`click`, handler);
+  // }
+
+  // setFavoritesButtonClickHandler(handler) {
+  //   this.getElement().querySelector(`.film-details__control-label--favorite`)
+  //     .addEventListener(`click`, handler);
+  // }
 }
