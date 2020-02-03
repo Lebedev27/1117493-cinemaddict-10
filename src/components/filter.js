@@ -11,10 +11,11 @@ const createFilterMarkup = (filter) => {
   if (name === FilterName.ALL || name === FilterName.STATS) {
     count = ``;
   }
+  const lowerLink = link.toLowerCase();
 
   return (
-    // `<a href="#${link}" class="main-navigation__item${decorFilterLink(name, isActive)}">${name}
-    `<a href="#${link.toLowerCase()}" id="${link.toLowerCase()}" class="main-navigation__item${isActive ? ` main-navigation__item--active` : ``}${name === FilterName.STATS ? ` main-navigation__item--additional` : ``}">${name}
+
+    `<a href="#${lowerLink}" id="${lowerLink}" class="main-navigation__item${isActive ? ` main-navigation__item--active` : ``}${name === FilterName.STATS ? ` main-navigation__item--additional` : ``}">${name}
 
     ${createCounter(count)}
     </a>`
@@ -50,6 +51,11 @@ export default class Filter extends AbstractComponent {
         handler(filterName[0].toUpperCase() + filterName.slice(1));
       }
     });
+  }
+
+
+  setShowStatisticHandler(handler) {
+    this.getElement().addEventListener(`click`, handler);
   }
 
 }

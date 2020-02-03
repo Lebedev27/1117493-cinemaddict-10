@@ -24,4 +24,4 @@ const getFilmsByFilter = (films, filterName) => {
   return films;
 };
 
-export {getFilmsByFilter};
+export {getFilmsByFilter, getWatchedFilms};

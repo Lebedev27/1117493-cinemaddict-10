@@ -1,18 +1,19 @@
 import FilterComponent from '../components/filter.js';
 import {FilterName} from '../constants.js';
 import {renderHtmlPart, RenderPosition, replace} from '../utils/render.js';
+import {bindAll} from '../utils/common.js';
 import {getFilmsByFilter} from '../utils/filter.js';
 
 export default class FilterController {
-  constructor(container, movieModel) {
+  constructor(container, movieModel, showStatisticHandler) {
     this._container = container;
     this._movieModel = movieModel;
+    this._showStatisticHandler = showStatisticHandler;
 
     this._activeFilterName = FilterName.ALL;
     this._filterComponent = null;
 
-    this._onDataChange = this._onDataChange.bind(this);
-    this._onFilterChange = this._onFilterChange.bind(this);
+    bindAll(this, [`_onDataChange`, `_onFilterChange`]);
 
     this._movieModel.setDataChangeHandler(this._onDataChange);
   }
@@ -31,6 +32,7 @@ export default class FilterController {
     this._filterComponent = new FilterComponent(filters);
 
     this._filterComponent.setFilterChangeHandler(this._onFilterChange);
+    this._filterComponent.setShowStatisticHandler(this._showStatisticHandler);
 
     if (oldComponent) {
       replace(this._filterComponent, oldComponent);
