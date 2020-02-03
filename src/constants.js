@@ -34,4 +34,9 @@ const KeyCode = {
   ESC: 27
 };
 
-export {Nodes, ExtraTitles, SortType, Count, KeyCode, RenderPosition};
+const Mode = {
+  DEFAULT: `default`,
+  POPUP: `popup`,
+};
+
+export {Nodes, ExtraTitles, SortType, Count, KeyCode, RenderPosition, Mode};
