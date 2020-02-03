@@ -1,7 +1,6 @@
 import AbstractSmartComponent from './abstract-smart-component.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import moment from 'moment';
 
 const InputValue = {
   ALL_TIME: `all-time`,
@@ -26,11 +25,6 @@ const DAYS_COUNT = {
   YEAR: 365
 };
 
-const TimeIndex = {
-  HOUR: 0,
-  MINUTE: 1
-};
-
 const ChartParameter = {
   TYPE: `horizontalBar`,
   BAR_COLOR: `#ffe800`,
@@ -44,19 +38,15 @@ const ChartParameter = {
 const MINUTES_IN_HOUR = 60;
 
 const getTotalDuration = (films) => {
-  const totalWatchedTime = films.map((film) => moment(film.time).format(`h:mm`).split(`:`));
-  const hours = totalWatchedTime.reduce((accumulator, currentValue) => {
-    return accumulator + Number(currentValue[TimeIndex.HOUR]);
-  }, 0);
-  const minutes = totalWatchedTime.reduce((accumulator, currentValue) => {
-    return accumulator + Number(currentValue[TimeIndex.MINUTE]);
-  }, 0);
-  const totalHours = hours + Math.round(minutes / MINUTES_IN_HOUR);
-  const totalMinutes = minutes % MINUTES_IN_HOUR;
+  const totalWatchedTime = films.map((film) => film.runtime).reduce((totalTime, runtime) => totalTime + runtime);
+
+  const totalHours = Math.floor(totalWatchedTime / MINUTES_IN_HOUR);
+  const totalMinutes = totalWatchedTime % MINUTES_IN_HOUR;
+
   return `${totalHours} <span class="statistic__item-description">h</span> ${totalMinutes} <span class="statistic__item-description">m</span>`;
 };
 
-const geFilteredFilmsByDate = (films, days) => {
+const getFilteredFilmsByDate = (films, days) => {
   if (days) {
     const dateNow = new Date();
     const dateFrom = (() => {
@@ -65,7 +55,7 @@ const geFilteredFilmsByDate = (films, days) => {
       return date;
     })();
     return films.filter((film) => {
-      return film.isWatched >= dateFrom;
+      return film.watchingDate >= dateFrom;
     });
   }
   return films;
@@ -232,7 +222,9 @@ export default class Statistics extends AbstractSmartComponent {
   handler(evt) {
     if (evt.target.tagName === `INPUT`) {
       this._target = evt.target.value;
-      const filteredFilmsByDate = geFilteredFilmsByDate(this._filmsData.getHistoryMovies(), DAYS_COUNT[(evt.target.value).toUpperCase()]);
+
+      const filteredFilmsByDate = getFilteredFilmsByDate(this._filmsData.getHistoryMovies(), DAYS_COUNT[(evt.target.value).toUpperCase()]);
+
       this.rerender(filteredFilmsByDate);
     }
   }

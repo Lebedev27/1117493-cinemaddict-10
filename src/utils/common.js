@@ -8,16 +8,14 @@ const getRandomArrayItem = (array) => {
   return array[randomIndex];
 };
 
-const sortFilms = (data, type, reverse) => {
+const sortFilms = (data, type, flag) => {
   const newData = data.slice();
-  if (reverse) {
-    newData.sort((a, b) => {
-      return a[type] - b[type];
-    });
+  if (flag === `reverse`) {
+    newData.sort((a, b) => a[type] - b[type]);
+  } else if (flag === `length`) {
+    newData.sort((a, b) => b[type].length - a[type].length);
   } else {
-    newData.sort((a, b) => {
-      return b[type] - a[type];
-    });
+    newData.sort((a, b) => b[type] - a[type]);
   }
   return newData;
 };
@@ -39,4 +37,6 @@ const bindAll = (ctx, props) => {
   });
 };
 
-export {getRandomDate, getRandomBetween, getRandomArrayItem, sortFilms, pluralize, bindAll};
+const calculateRunTime = (time) => `${Math.floor(time / 60)}h ${time % 60}m`;
+
+export {getRandomDate, calculateRunTime, getRandomBetween, getRandomArrayItem, sortFilms, pluralize, bindAll};

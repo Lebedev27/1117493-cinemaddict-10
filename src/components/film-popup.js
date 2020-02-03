@@ -1,7 +1,8 @@
 import moment from 'moment';
 import he from 'he';
 import AbstractSmartComponent from './abstract-smart-component.js';
-import {pluralize} from '../utils/common.js';
+import MovieModel from '../models/movie';
+import {pluralize, calculateRunTime, bindAll} from '../utils/common.js';
 
 const popupRatingLength = 9;
 
@@ -37,7 +38,7 @@ const generateRating = (userRating) => {
   return userRatingMenu.join(`\n`);
 };
 
-const generateSelfFilmRating = (isWatched, title, image, userRating) => {
+const generateSelfFilmRating = (isWatched, title, poster, userRating) => {
   if (!isWatched) {
     return ``;
   }
@@ -50,7 +51,7 @@ const generateSelfFilmRating = (isWatched, title, image, userRating) => {
 
         <div class="film-details__user-score">
           <div class="film-details__user-rating-poster">
-            <img src="./images/posters/${image}" alt="film-poster" class="film-details__user-rating-img">
+            <img src="${poster}" alt="film-poster" class="film-details__user-rating-img">
           </div>
 
           <section class="film-details__user-rating-inner">
@@ -74,6 +75,12 @@ const generateGenres = (genres) => {
   }).join(`\n`);
 };
 
+const generateActors = (actors) => {
+  return actors.map((actor, index) => {
+    return index !== 0 ? ` ${actor}` : `${actor}`;
+  });
+};
+
 const generateUserRatingLabel = (isWatched, userRating) => {
   if (isWatched && userRating > 0) {
     return `<p class="film-details__user-rating">Your rate ${userRating}</p>`;
@@ -85,7 +92,7 @@ const generateComment = (comments) => {
   return comments.map((comment) => {
     return `<li class="film-details__comment">
     <span class="film-details__comment-emoji">
-      <img src="./images/emoji/${comment.emoji}.png" width="55" height="55" alt="emoji">
+      <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji">
     </span>
     <div>
       <p class="film-details__comment-text">${comment.comment}</p>
@@ -115,20 +122,20 @@ const objKeysUppercaseFirstLetter = (obj) => {
 };
 
 const createFilmPopupTemplate = (data) => {
-  const {title, image, rating, time, genre, description, comments, director, writers, actors, releaseDate, country, isWatchList, isWatched, isFavorite, userRating, userEmoji} = data;
+  const {title, alternativeTitle, poster, totalRating, ageRating, runtime, genre, description, comments, director, writers, actors, releaseDate, releaseCountry, isWatchlist, isWatched, isFavorite, personalRating, userEmoji} = data;
 
   const FilmsDetailsRow = {
     'DIRECTOR': director,
     'WRITERS': writers,
-    'ACTORS': actors,
+    'ACTORS': generateActors(actors),
     'RELEASE_DATE': moment(releaseDate).format(`D MMMM YYYY`),
-    'RUNTIME': moment(time).format(`h[h] mm[m]`),
-    'COUNTRY': country
+    'RUNTIME': calculateRunTime(runtime),
+    'COUNTRY': releaseCountry
   };
   const popupFilmsDetailsRow = objKeysUppercaseFirstLetter(FilmsDetailsRow);
 
   const FilmDetailsControls = {
-    WATCHLIST: [`Add to watchlist`, isWatchList],
+    WATCHLIST: [`Add to watchlist`, isWatchlist],
     WATCHED: [`Already watched`, isWatched],
     FAVORITE: [`Add to favorites`, isFavorite]
   };
@@ -141,21 +148,21 @@ const createFilmPopupTemplate = (data) => {
         </div>
         <div class="film-details__info-wrap">
           <div class="film-details__poster">
-            <img class="film-details__poster-img" src="./images/posters/${image}" alt="">
+            <img class="film-details__poster-img" src="${poster}" alt="">
 
-            <p class="film-details__age">18+</p>
+            <p class="film-details__age">${ageRating}+</p>
           </div>
 
           <div class="film-details__info">
             <div class="film-details__info-head">
               <div class="film-details__title-wrap">
                 <h3 class="film-details__title">${title}</h3>
-                <p class="film-details__title-original">Original: ${title}</p>
+                <p class="film-details__title-original">Original: ${alternativeTitle}</p>
               </div>
 
               <div class="film-details__rating">
-                <p class="film-details__total-rating">${rating}</p>
-                ${generateUserRatingLabel(isWatched, userRating)}
+                <p class="film-details__total-rating">${totalRating}</p>
+                ${generateUserRatingLabel(isWatched, personalRating)}
               </div>
             </div>
 
@@ -180,7 +187,7 @@ const createFilmPopupTemplate = (data) => {
         </section>
       </div>
 
-      ${generateSelfFilmRating(isWatched, title, image, userRating)}
+      ${generateSelfFilmRating(isWatched, title, poster, personalRating)}
 
       <div class="form-details__bottom-container">
         <section class="film-details__comments-wrap">
@@ -226,21 +233,14 @@ const createFilmPopupTemplate = (data) => {
 };
 
 export default class FilmPopup extends AbstractSmartComponent {
-  constructor(data) {
+  constructor(data, onDataChange) {
     super();
     this._data = data;
+    this._onDataChange = onDataChange;
 
     this._handler = null;
 
-    this.recoverListeners = this.recoverListeners.bind(this);
-    this._subscribeOnEvents = this._subscribeOnEvents.bind(this);
-    this.watchlistControlClickHandler = this.watchlistControlClickHandler.bind(this);
-    this.favoriteControlClickHandler = this.favoriteControlClickHandler.bind(this);
-    this.watchedControlClickHandler = this.watchedControlClickHandler.bind(this);
-    this.userRatingScoreClickHandler = this.userRatingScoreClickHandler.bind(this);
-    this.emojiClickHandler = this.emojiClickHandler.bind(this);
-    this.commentChangeHandler = this.commentChangeHandler.bind(this);
-    this.deleteClickHandler = this.deleteClickHandler.bind(this);
+    bindAll(this, [`recoverListeners`, `_subscribeOnEvents`, `watchlistControlClickHandler`, `favoriteControlClickHandler`, `watchedControlClickHandler`, `userRatingScoreClickHandler`, `emojiClickHandler`, `commentChangeHandler`, `deleteClickHandler`]);
   }
 
   getTemplate() {
@@ -318,25 +318,35 @@ export default class FilmPopup extends AbstractSmartComponent {
   }
 
   watchlistControlClickHandler() {
-    this._data.isWatchList = !this._data.isWatchList;
-    this.rerender();
+    const newFilm = MovieModel.clone(this._data);
+    newFilm.isWatchlist = !newFilm.isWatchlist;
+
+    this._onDataChange(this._data, newFilm, this.rerender);
   }
 
   favoriteControlClickHandler() {
-    this._data.isFavorite = !this._data.isFavorite;
-    this.rerender();
+    const newFilm = MovieModel.clone(this._data);
+    newFilm.isFavorite = !newFilm.isFavorite;
+
+    this._onDataChange(this._data, newFilm, this.rerender);
   }
 
   watchedControlClickHandler() {
-    this._data.isWatched = this._data.isWatched ? !this._data.isWatched : new Date();
-    this._data.userRating = `0`;
-    this.rerender();
+    const newFilm = MovieModel.clone(this._data);
+    newFilm.isWatched = !newFilm.isWatched;
+
+    newFilm.personalRating = 0;
+    newFilm.watchingDate = newFilm.isWatched ? new Date() : newFilm.watchingDate;
+
+    this._onDataChange(this._data, newFilm, this.rerender);
   }
 
   userRatingScoreClickHandler(evt) {
     if (evt.target.tagName === `LABEL`) {
-      this._data.userRating = evt.target.textContent;
-      this.rerender();
+      const newFilm = MovieModel.clone(this._data);
+      newFilm.personalRating = Number(evt.target.textContent);
+
+      this._onDataChange(this._data, newFilm, this.rerender);
     }
   }
 

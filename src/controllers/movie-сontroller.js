@@ -1,6 +1,6 @@
-import {Nodes, KeyCode, Mode, NAMES} from '../constants.js';
+import {Nodes, KeyCode, Mode} from '../constants.js';
 import {renderHtmlPart, RenderPosition, remove} from '../utils/render.js';
-import {getRandomArrayItem} from '../utils/common.js';
+import MovieModel from '../models/movie';
 import FilmCardComponent from '../components/film-card.js';
 import FilmPopupComponent from '../components/film-popup.js';
 import FilmPopupBgComponent from '../components/film-popup-bg.js';
@@ -21,20 +21,13 @@ export default class MovieController {
     this._filmCardPopupComponent = null;
 
     bindAll(this, [`_cardClickHandler`, `_removePopupCkickHandler`, `_removePopupKeydownHandler`, `watchListButtonClickHandler`, `watchedButtonClickHandler`, `favoritesButtonClickHandler`, `submitCommentKeydownHandler`]);
-    // this._cardClickHandler = this._cardClickHandler.bind(this);
-    // this._removePopupCkickHandler = this._removePopupCkickHandler.bind(this);
-    // this._removePopupKeydownHandler = this._removePopupKeydownHandler.bind(this);
-    // this.watchListButtonClickHandler = this.watchListButtonClickHandler.bind(this);
-    // this.watchedButtonClickHandler = this.watchedButtonClickHandler.bind(this);
-    // this.favoritesButtonClickHandler = this.favoritesButtonClickHandler.bind(this);
-    // this.submitCommentKeydownHandler = this.submitCommentKeydownHandler.bind(this);
   }
 
   render(filmCardData) {
     this._cardData = filmCardData;
     this._filmCardComponent = new FilmCardComponent(this._cardData);
     this._filmCardPopupBgComponent = new FilmPopupBgComponent(this._cardData);
-    this._filmCardPopupComponent = new FilmPopupComponent(this._cardData);
+    this._filmCardPopupComponent = new FilmPopupComponent(this._cardData, this._onDataChange);
 
     this._filmCardComponent.setClickHandler(this._cardClickHandler);
     this._filmCardComponent.setWatchListButtonClickHandler(this.watchListButtonClickHandler);
@@ -72,23 +65,29 @@ export default class MovieController {
 
   watchListButtonClickHandler(evt) {
     evt.preventDefault();
-    this._onDataChange(this._cardData, Object.assign({}, this._cardData, {
-      isWatchList: !this._cardData.isWatchList,
-    }));
+    const newFilm = MovieModel.clone(this._cardData);
+    newFilm.isWatchlist = !newFilm.isWatchlist;
+
+    this._onDataChange(this._cardData, newFilm);
   }
 
   watchedButtonClickHandler(evt) {
     evt.preventDefault();
-    this._onDataChange(this._cardData, Object.assign({}, this._cardData, {
-      isWatched: this._cardData.isWatched ? !this._cardData.isWatched : new Date()
-    }));
+    const newFilm = MovieModel.clone(this._cardData);
+    newFilm.isWatched = !newFilm.isWatched;
+    newFilm.personalRating = 0;
+    newFilm.watchingDate = newFilm.isWatched ? new Date() : newFilm.watchingDate;
+
+    this._onDataChange(this._cardData, newFilm);
+
   }
 
   favoritesButtonClickHandler(evt) {
     evt.preventDefault();
-    this._onDataChange(this._cardData, Object.assign({}, this._cardData, {
-      isFavorite: !this._cardData.isFavorite,
-    }));
+    const newFilm = MovieModel.clone(this._cardData);
+    newFilm.isFavorite = !newFilm.isFavorite;
+
+    this._onDataChange(this._cardData, newFilm);
   }
 
   submitCommentKeydownHandler(evt) {
@@ -96,15 +95,18 @@ export default class MovieController {
       const data = this._filmCardPopupComponent.getData();
 
       if (data.userEmoji && data.userComment) {
-        data.comments.push({
-          emoji: data.userEmoji,
-          comment: data.userComment,
-          author: `${getRandomArrayItem(NAMES)} ${getRandomArrayItem(NAMES)}`,
-          date: new Date()
+        this._cardData.comments.push({
+          emotion: String(data.userEmoji),
+          comment: String(data.userComment),
+          date: String(new Date())
         });
         delete data.userEmoji;
         delete data.userComment;
-        this._onDataChange(this._cardData, data);
+
+        const newFilm = MovieModel.clone(this._cardData);
+        newFilm.comments = data.comments;
+
+        this._onDataChange(this._cardData, newFilm);
         this._filmCardPopupComponent.rerender();
       }
     }
@@ -117,7 +119,7 @@ export default class MovieController {
       document.removeEventListener(`keydown`, this.submitCommentKeydownHandler);
 
       this._mode = Mode.DEFAULT;
-      this._onDataChange(this._cardData, Object.assign({}, this._cardData, this._filmCardPopupComponent.getData()));
+
       remove(this._filmCardPopupComponent);
       remove(this._filmCardPopupBgComponent);
     }

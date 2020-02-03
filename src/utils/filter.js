@@ -1,7 +1,7 @@
 import {FilterName} from '../constants.js';
 
 const getWatchlistFilms = (films) => {
-  return films.filter((film) => film.isWatchList);
+  return films.filter((film) => film.isWatchlist);
 };
 
 const getWatchedFilms = (films) => {

@@ -10,6 +10,7 @@ export default class Movies {
     this.genresData = null;
     this.sortedGenresData = null;
     this.topGenre = null;
+    this._filmsComments = null;
 
     this._dataChangeHandlers = [];
     this._filterChangeHandlers = [];
@@ -54,6 +55,13 @@ export default class Movies {
   setFilter(filterName) {
     this._activeFilterName = filterName;
     this._filterChangeHandlers.forEach((handler) => handler());
+  }
+
+  setComments(cards) {
+    this._filmsComments = Array.from(cards);
+  }
+  getComments() {
+    return this._filmsComments;
   }
 
   updateMovie(id, movie) {

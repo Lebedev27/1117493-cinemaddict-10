@@ -50,7 +50,7 @@ const GenreIndex = {
 const SortType = {
   DEFAULT: `default`,
   DATE: `releaseDate`,
-  RATING: `rating`,
+  RATING: `totalRating`,
   COMMENTS: `comments`
 };
 
