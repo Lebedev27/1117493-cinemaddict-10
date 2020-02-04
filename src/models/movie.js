@@ -25,7 +25,6 @@ export default class Movie {
   }
 
   getCommentsId() {
-
     if (typeof this.comments[0] === `object`) {
       return this.comments.map((comment) => comment.id);
     }
