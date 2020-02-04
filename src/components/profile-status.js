@@ -1,15 +1,14 @@
 import AbstractComponent from './abstract-component.js';
-import {getRandomBetween} from '../utils/common.js';
 
-const userRanks = [``, `Novice`, `Fan`, `Movie Buff`];
-const devider = 10;
+const USER_RANKS = [``, `Novice`, `Fan`, `Movie Buff`];
+const DEVIDER = 10;
 
-const generateUserRankIndex = (max) => Math.ceil(getRandomBetween(0, max) / devider);
+const generateUserRankIndex = (max) => Math.ceil(max / DEVIDER);
 
-const getUserRank = (max) => userRanks[generateUserRankIndex(max)];
+const getUserRank = (max) => USER_RANKS[generateUserRankIndex(max)];
 
-const createProfileStatusTemplate = (max) => {
-  const userRank = getUserRank(max);
+const createProfileStatusTemplate = (watchedFilmsQuantity) => {
+  const userRank = getUserRank(watchedFilmsQuantity);
   return (
     `<section class="header__profile profile">
       <p class="profile__rating">${userRank}</p>
@@ -19,12 +18,13 @@ const createProfileStatusTemplate = (max) => {
 };
 
 export default class ProfileStatus extends AbstractComponent {
-  constructor(max) {
+  constructor(movieModel) {
     super();
-    this._max = max;
+    this._movieModel = movieModel;
+    this._watchedFilms = this._movieModel.getHistoryMovies();
   }
 
   getTemplate() {
-    return createProfileStatusTemplate(this._max);
+    return createProfileStatusTemplate(this._watchedFilms.length);
   }
 }

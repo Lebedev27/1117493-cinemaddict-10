@@ -1,11 +1,23 @@
 import moment from 'moment';
 import he from 'he';
+import debounce from 'lodash/debounce';
 import AbstractSmartComponent from './abstract-smart-component.js';
 import MovieModel from '../models/movie';
-import {pluralize, calculateRunTime, bindAll} from '../utils/common.js';
+import {ButtonStatus, DEBOUNCE_TIMEOUT, TagName, SortFlag} from '../constants.js';
+import {pluralize, calculateRunTime, bindAll, sortFilms, mapEntries} from '../utils/common.js';
+
+const TimeInSeconds = {
+  MILLISECONDS: 0.001,
+  MINUTE: 59,
+  THREE_MINUTES: 180,
+  HOUR: 3540,
+  TWO_HOURS: 7140,
+  DAY: 86340
+};
 
 const SHAKE_ANIMATION_TIMEOUT = 600;
 const POPUP_RATING_LENGTH = 9;
+
 const Color = {
   ERROR: `red`,
   DISABLED: `#999`,
@@ -14,36 +26,55 @@ const Color = {
   RATING_LABEL: `#d8d8d8`
 };
 
+const Handler = {
+  RECOVER_LISTENERS: `recoverListeners`,
+  SUBSCRIBE_ON_EVENTS: `_subscribeOnEvents`,
+  WATCHLIST_CONTROL_CLICK_HANDLER: `watchlistControlClickHandler`,
+  FAVORITE_CONTROL_CLICK_HANDLER: `favoriteControlClickHandler`,
+  WATCHED_CONTROL_CLICK_HANDLER: `watchedControlClickHandler`,
+  USER_RATING_SCORE_CLICK_HANDLER: `userRatingScoreClickHandler`,
+  USER_RATING_SCORE_RESET_CLICK_HANDLER: `userRatingScoreResetClickHandler`,
+  EMOJI_CLICK_HANDLER: `emojiClickHandler`,
+  COMMENT_CHANGE_HANDLER: `commentChangeHandler`,
+  DELETE_CLICK_HANDLER: `deleteClickHandler`
+};
+
+const DATE_SORT_TYPE = `date`;
+
+const filmsDetailsRowTemplate = ([key, name]) => {
+  return `
+    <tr class="film-details__row">
+      <td class="film-details__term">${key}</td>
+      <td class="film-details__cell">${name}</td>
+    </tr>
+  `;
+};
+
+const filmsDetailsControlsTemplate = ([key, name]) => {
+  const loweKey = key.toLowerCase();
+  return `
+  <input type="checkbox" class="film-details__control-input visually-hidden" id="${loweKey}" name="${loweKey}"${name[1] ? ` checked` : ``}>
+  <label for="${loweKey}" class="film-details__control-label film-details__control-label--${loweKey}">${name[0]}</label>
+  `;
+};
+
 const generateFilmsDetailsRow = (filmsDetailsRow) => {
-  return Object.entries(filmsDetailsRow).map(([key, name]) => {
-    return `
-      <tr class="film-details__row">
-        <td class="film-details__term">${key}</td>
-        <td class="film-details__cell">${name}</td>
-      </tr>
-    `;
-  }).join(`\n`);
+  return mapEntries(filmsDetailsRow, filmsDetailsRowTemplate).join(`\n`);
 };
 
 const generateFilmDetailsControls = (filmDetailsControls) => {
-  return Object.entries(filmDetailsControls).map(([key, name]) => {
-    const loweKey = key.toLowerCase();
-    return `
-    <input type="checkbox" class="film-details__control-input visually-hidden" id="${loweKey}" name="${loweKey}"${name[1] ? ` checked` : ``}>
-    <label for="${loweKey}" class="film-details__control-label film-details__control-label--${loweKey}">${name[0]}</label>
-    `;
-  }).join(`\n`);
+  return mapEntries(filmDetailsControls, filmsDetailsControlsTemplate).join(`\n`);
 };
 
 const generateRating = (userRating) => {
-  const userRatingMenu = [];
+  const userRatingMenus = [];
   for (let i = 1; i <= POPUP_RATING_LENGTH; i++) {
-    userRatingMenu.push(
+    userRatingMenus.push(
         `<input type="radio" name="score" class="film-details__user-rating-input visually-hidden" value="${i}" id="rating-${i}"${Number(userRating) === (i) ? ` checked` : ``}>
          <label class="film-details__user-rating-label" for="rating-${i}">${i}</label>`
     );
   }
-  return userRatingMenu.join(`\n`);
+  return userRatingMenus.join(`\n`);
 };
 
 const generateSelfFilmRating = (isWatched, title, poster, userRating) => {
@@ -96,8 +127,29 @@ const generateUserRatingLabel = (isWatched, userRating) => {
   return ``;
 };
 
+const setDateFromNow = (commentDate, dateNow) => {
+  const dateDifferenceSeconds = (dateNow - commentDate) * TimeInSeconds.MILLISECONDS;
+  if (dateDifferenceSeconds <= TimeInSeconds.MINUTE) {
+    return `now`;
+  } else if (dateDifferenceSeconds > TimeInSeconds.MINUTE && dateDifferenceSeconds <= TimeInSeconds.THREE_MINUTES) {
+    return `a minute ago`;
+  } else if (dateDifferenceSeconds > TimeInSeconds.THREE_MINUTES && dateDifferenceSeconds <= TimeInSeconds.HOUR) {
+    return `a few minutes ago`;
+  } else if (dateDifferenceSeconds > TimeInSeconds.HOUR && dateDifferenceSeconds <= TimeInSeconds.TWO_HOURS) {
+    return `a hour ago`;
+  } else if (dateDifferenceSeconds > TimeInSeconds.TWO_HOURS && dateDifferenceSeconds <= TimeInSeconds.DAY) {
+    return `a few hours ago`;
+  }
+  return moment(commentDate).fromNow();
+};
+
 const generateComment = (comments) => {
-  return comments.map((comment) => {
+  const sortedComments = sortFilms(comments, DATE_SORT_TYPE, SortFlag.REVERSE);
+  const nowDate = Date.now();
+
+  return sortedComments.map((comment) => {
+    const commentDate = new Date(comment.date);
+
     return `<li class="film-details__comment">
     <span class="film-details__comment-emoji">
       <img src="./images/emoji/${comment.emotion}.png" width="55" height="55" alt="emoji">
@@ -106,7 +158,7 @@ const generateComment = (comments) => {
       <p class="film-details__comment-text">${comment.comment}</p>
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${comment.author}</span>
-        <span class="film-details__comment-day">${moment(comment.date).fromNow()}</span>
+        <span class="film-details__comment-day">${setDateFromNow(commentDate, nowDate)}</span>
         <button class="film-details__comment-delete">Delete</button>
       </p>
     </div>
@@ -132,6 +184,12 @@ const objKeysUppercaseFirstLetter = (obj) => {
 const createFilmPopupTemplate = (data) => {
   const {title, alternativeTitle, poster, totalRating, ageRating, runtime, genre, description, comments, director, writers, actors, releaseDate, releaseCountry, isWatchlist, isWatched, isFavorite, personalRating, userEmoji} = data;
 
+  const FilmDetailsControls = {
+    WATCHLIST: [`Add to watchlist`, isWatchlist],
+    WATCHED: [`Already watched`, isWatched],
+    FAVORITE: [`Add to favorites`, isFavorite]
+  };
+
   const FilmsDetailsRow = {
     'DIRECTOR': director,
     'WRITERS': writers,
@@ -140,13 +198,8 @@ const createFilmPopupTemplate = (data) => {
     'RUNTIME': calculateRunTime(runtime),
     'COUNTRY': releaseCountry
   };
-  const popupFilmsDetailsRow = objKeysUppercaseFirstLetter(FilmsDetailsRow);
 
-  const FilmDetailsControls = {
-    WATCHLIST: [`Add to watchlist`, isWatchlist],
-    WATCHED: [`Already watched`, isWatched],
-    FAVORITE: [`Add to favorites`, isFavorite]
-  };
+  const popupFilmsDetailsRow = objKeysUppercaseFirstLetter(FilmsDetailsRow);
 
   return (
     `<form class="film-details__inner" action="" method="get">
@@ -247,10 +300,12 @@ export default class FilmPopup extends AbstractSmartComponent {
     this._onDataChange = onDataChange;
 
     this.clickedRatingIcon = null;
+    this._clickedDeleteButton = null;
+    this._clickedUndoButton = null;
 
     this._handler = null;
 
-    bindAll(this, [`recoverListeners`, `_subscribeOnEvents`, `watchlistControlClickHandler`, `favoriteControlClickHandler`, `watchedControlClickHandler`, `userRatingScoreClickHandler`, `userRatingScoreResetClickHandler`, `emojiClickHandler`, `commentChangeHandler`, `deleteClickHandler`]);
+    bindAll(this, [Handler.RECOVER_LISTENERS, Handler.SUBSCRIBE_ON_EVENTS, Handler.WATCHLIST_CONTROL_CLICK_HANDLER, Handler.FAVORITE_CONTROL_CLICK_HANDLER, Handler.WATCHED_CONTROL_CLICK_HANDLER, Handler.USER_RATING_SCORE_CLICK_HANDLER, Handler.USER_RATING_SCORE_RESET_CLICK_HANDLER, Handler.EMOJI_CLICK_HANDLER, Handler.COMMENT_CHANGE_HANDLER, Handler.DELETE_CLICK_HANDLER]);
   }
 
   getTemplate() {
@@ -269,23 +324,23 @@ export default class FilmPopup extends AbstractSmartComponent {
     const element = this.getElement();
 
     element.querySelector(`.film-details__control-label--watchlist`)
-      .addEventListener(`click`, this.watchlistControlClickHandler);
+      .addEventListener(`click`, debounce(this.watchlistControlClickHandler, DEBOUNCE_TIMEOUT));
 
     element.querySelector(`.film-details__control-label--watched`)
-      .addEventListener(`click`, this.watchedControlClickHandler);
+      .addEventListener(`click`, debounce(this.watchedControlClickHandler, DEBOUNCE_TIMEOUT));
 
     if (element.querySelector(`.film-details__user-rating-score`)) {
       element.querySelector(`.film-details__user-rating-score`)
-        .addEventListener(`click`, this.userRatingScoreClickHandler);
+        .addEventListener(`click`, debounce(this.userRatingScoreClickHandler, DEBOUNCE_TIMEOUT));
       element.querySelector(`.film-details__watched-reset`)
-        .addEventListener(`click`, this.userRatingScoreResetClickHandler);
+        .addEventListener(`click`, debounce(this.userRatingScoreResetClickHandler, DEBOUNCE_TIMEOUT));
     }
 
     element.querySelector(`.film-details__emoji-list`)
     .addEventListener(`click`, this.emojiClickHandler);
 
     element.querySelector(`.film-details__control-label--favorite`)
-      .addEventListener(`click`, this.favoriteControlClickHandler);
+      .addEventListener(`click`, debounce(this.favoriteControlClickHandler, DEBOUNCE_TIMEOUT));
 
     element.querySelector(`.film-details__close-btn`)
       .addEventListener(`click`, this._handler);
@@ -313,7 +368,10 @@ export default class FilmPopup extends AbstractSmartComponent {
   deleteClickHandler(evt) {
     evt.preventDefault();
     let commentId;
-    if (evt.target.tagName === `BUTTON`) {
+    if (evt.target.tagName === TagName.BUTTON) {
+      this._clickedDeleteButton = evt.target;
+      this.setDisabledDeleteButton();
+
       const commentText = evt.target.closest(`.film-details__comment`).querySelector(`.film-details__comment-text`).textContent;
       const newFilm = MovieModel.clone(this._data);
 
@@ -327,6 +385,16 @@ export default class FilmPopup extends AbstractSmartComponent {
       });
       this._onDataChange(this._data, newFilm, this, null, commentId, this._data);
     }
+  }
+
+  setDisabledDeleteButton() {
+    this._clickedDeleteButton.textContent = ButtonStatus.DELETING;
+    this._clickedDeleteButton.disabled = true;
+  }
+
+  unSetDisabledDeleteButton() {
+    this._clickedDeleteButton.textContent = ButtonStatus.DELETE;
+    this._clickedDeleteButton.disabled = false;
   }
 
   commentChangeHandler() {
@@ -359,10 +427,10 @@ export default class FilmPopup extends AbstractSmartComponent {
   }
 
   userRatingScoreClickHandler(evt) {
-    if (evt.target.tagName === `LABEL`) {
+    if (evt.target.tagName === TagName.LABEL) {
       this.clickedRatingIcon = evt.target;
     }
-    if (evt.target.tagName === `INPUT`) {
+    if (evt.target.tagName === TagName.INPUT) {
       const newFilm = MovieModel.clone(this._data);
       newFilm.personalRating = Number(evt.target.value);
 
@@ -372,15 +440,29 @@ export default class FilmPopup extends AbstractSmartComponent {
     }
   }
 
-  userRatingScoreResetClickHandler() {
+  userRatingScoreResetClickHandler(evt) {
+    this._clickedUndoButton = evt.target;
+    this.setDisabledUndoButton();
+    this.addRatingStyles();
+
     const newFilm = MovieModel.clone(this._data);
     newFilm.personalRating = 0;
 
     this._onDataChange(this._data, newFilm, this);
   }
 
+  setDisabledUndoButton() {
+    this._clickedUndoButton.textContent = ButtonStatus.UNDOING;
+    this._clickedUndoButton.disabled = true;
+  }
+
+  unSetDisabledUndoButton() {
+    this._clickedUndoButton.textContent = ButtonStatus.UNDO;
+    this._clickedUndoButton.disabled = false;
+  }
+
   emojiClickHandler(evt) {
-    if (evt.target.tagName === `INPUT` || evt.target.parentNode.tagName === `INPUT`) {
+    if (evt.target.tagName === TagName.INPUT || evt.target.parentNode.tagName === TagName.INPUT) {
       this._data.userEmoji = evt.target.id.slice(6);
       this.rerender();
     }

@@ -7,19 +7,16 @@ const createElement = (template) => {
 };
 
 const renderHtmlPart = (container, component, place) => {
-  switch (place) {
-    case RenderPosition.AFTERBEGIN:
-      container.prepend(component);
-      break;
-    case RenderPosition.BEFOREEND:
-      container.append(component);
-      break;
+  if (place === RenderPosition.AFTERBEGIN) {
+    container.prepend(component);
+  } else {
+    container.append(component);
   }
 };
 
-const createFragment = (arr) => {
+const createFragment = (elements) => {
   const fragment = document.createDocumentFragment();
-  for (const element of arr) {
+  for (const element of elements) {
     fragment.appendChild(element);
   }
   return fragment;

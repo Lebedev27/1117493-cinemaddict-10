@@ -1,11 +1,20 @@
 import {Nodes, KeyCode, Mode} from '../constants.js';
 import {renderHtmlPart, RenderPosition, remove} from '../utils/render.js';
-import MovieModel from '../models/movie';
+import MovieModel from '../models/movie.js';
 import FilmCardComponent from '../components/film-card.js';
 import FilmPopupComponent from '../components/film-popup.js';
 import FilmPopupBgComponent from '../components/film-popup-bg.js';
 import {bindAll} from '../utils/common.js';
 
+const Handler = {
+  CARD_CLICK_HANDLER: `_cardClickHandler`,
+  REMOVE_POPUP_CLICK_HANDLER: `_removePopupCkickHandler`,
+  REMOVE_POPUP_KEYDOWN_HANDLER: `_removePopupKeydownHandler`,
+  WATCHLIST_BUTTON_CLICK_HANDLER: `watchListButtonClickHandler`,
+  WATCHED_BUTTON_CLICK_HANDLER: `watchedButtonClickHandler`,
+  FAVORITES_BUTTON_CLICK_HANDLER: `favoritesButtonClickHandler`,
+  SUBMIT_COMMENT_KEYDOWN_HANDLER: `submitCommentKeydownHandler`
+};
 export default class MovieController {
   constructor(container, onDataChange, onViewChange) {
     this._container = container;
@@ -20,7 +29,7 @@ export default class MovieController {
     this._filmCardPopupBgComponent = null;
     this._filmCardPopupComponent = null;
 
-    bindAll(this, [`_cardClickHandler`, `_removePopupCkickHandler`, `_removePopupKeydownHandler`, `watchListButtonClickHandler`, `watchedButtonClickHandler`, `favoritesButtonClickHandler`, `submitCommentKeydownHandler`]);
+    bindAll(this, [Handler.CARD_CLICK_HANDLER, Handler.REMOVE_POPUP_CLICK_HANDLER, Handler.REMOVE_POPUP_KEYDOWN_HANDLER, Handler.WATCHLIST_BUTTON_CLICK_HANDLER, Handler.WATCHED_BUTTON_CLICK_HANDLER, Handler.FAVORITES_BUTTON_CLICK_HANDLER, Handler.SUBMIT_COMMENT_KEYDOWN_HANDLER]);
   }
 
   render(filmCardData) {
@@ -37,9 +46,16 @@ export default class MovieController {
     this._container.appendChild(this._filmCardComponent.getElement());
   }
 
-  setDefaultView() {
-    if (this._mode !== Mode.DEFAULT) {
-      this._popupRemove();
+  _removePopup() {
+    if (this._filmCardPopupComponent.getElement()) {
+      this._filmCardPopupComponent.removeClickHandler(this._removePopupCkickHandler);
+      document.removeEventListener(`keydown`, this._removePopupKeydownHandler);
+      document.removeEventListener(`keydown`, this.submitCommentKeydownHandler);
+
+      this._mode = Mode.DEFAULT;
+
+      remove(this._filmCardPopupComponent);
+      remove(this._filmCardPopupBgComponent);
     }
   }
 
@@ -49,6 +65,7 @@ export default class MovieController {
     const filmComments = this._filmCardComponent.getElement().querySelector(`a`);
 
     if ([filmTitle, filmImage, filmComments].includes(evt.target)) {
+      this._onViewChange();
       const filmCardPopupBg = this._filmCardPopupBgComponent.getElement();
 
       renderHtmlPart(Nodes.BODY, filmCardPopupBg, RenderPosition.BEFOREEND);
@@ -63,16 +80,14 @@ export default class MovieController {
     }
   }
 
-  watchListButtonClickHandler(evt) {
-    evt.preventDefault();
+  watchListButtonClickHandler() {
     const newFilm = MovieModel.clone(this._cardData);
     newFilm.isWatchlist = !newFilm.isWatchlist;
 
     this._onDataChange(this._cardData, newFilm);
   }
 
-  watchedButtonClickHandler(evt) {
-    evt.preventDefault();
+  watchedButtonClickHandler() {
     const newFilm = MovieModel.clone(this._cardData);
     newFilm.isWatched = !newFilm.isWatched;
     newFilm.personalRating = 0;
@@ -82,8 +97,7 @@ export default class MovieController {
 
   }
 
-  favoritesButtonClickHandler(evt) {
-    evt.preventDefault();
+  favoritesButtonClickHandler() {
     const newFilm = MovieModel.clone(this._cardData);
     newFilm.isFavorite = !newFilm.isFavorite;
 
@@ -111,26 +125,13 @@ export default class MovieController {
     }
   }
 
-  _popupRemove() {
-    if (this._filmCardPopupComponent.getElement()) {
-      this._filmCardPopupComponent.removeClickHandler(this._removePopupCkickHandler);
-      document.removeEventListener(`keydown`, this._removePopupKeydownHandler);
-      document.removeEventListener(`keydown`, this.submitCommentKeydownHandler);
-
-      this._mode = Mode.DEFAULT;
-
-      remove(this._filmCardPopupComponent);
-      remove(this._filmCardPopupBgComponent);
-    }
-  }
-
   _removePopupCkickHandler() {
-    this._popupRemove();
+    this._removePopup();
   }
 
   _removePopupKeydownHandler(evt) {
     if (evt.keyCode === KeyCode.ESC) {
-      this._popupRemove();
+      this._removePopup();
     }
   }
 }

@@ -59,6 +59,10 @@ export default class Movies {
 
   setComments(cards) {
     this._filmsComments = Array.from(cards);
+
+    this._movies.forEach((movie) => {
+      movie.comments = this._filmsComments[movie.id];
+    });
   }
 
   updateComments(id, comments) {

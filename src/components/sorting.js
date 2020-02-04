@@ -1,4 +1,4 @@
-import {SortType} from '../constants.js';
+import {SortType, TagName} from '../constants.js';
 import AbstractComponent from './abstract-component.js';
 
 const createSortingTemplate = () => {
@@ -23,10 +23,14 @@ export default class Sorting extends AbstractComponent {
   }
 
   setSortTypeChangeHandler(handler) {
-    this.getElement().addEventListener(`click`, (evt) => {
+    this.getElement().addEventListener(`click`, this.sortTypeChangeHandler(handler));
+  }
+
+  sortTypeChangeHandler(handler) {
+    return (evt) => {
       evt.preventDefault();
 
-      if (evt.target.tagName !== `A`) {
+      if (evt.target.tagName !== TagName.A) {
         return;
       }
       const sortType = evt.target.dataset.sortType;
@@ -38,6 +42,11 @@ export default class Sorting extends AbstractComponent {
       this._currenSortType = sortType;
 
       handler(this._currenSortType);
-    });
+    };
+  }
+
+  setSortTypeDefault() {
+    const sortByDefault = this.getElement().querySelector(`a[data-sort-type="default"]`);
+    sortByDefault.click();
   }
 }

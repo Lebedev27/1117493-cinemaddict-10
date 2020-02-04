@@ -8,32 +8,11 @@ const FilterName = {
   STATS: `Stats`
 };
 
-const FILTER_MAX_VALUE = 20;
-
 const Nodes = {
   BODY: document.querySelector(`body`),
   HEADER: document.querySelector(`.header`),
   MAIN: document.querySelector(`.main`),
   FOOTER_STATISTIC: document.querySelector(`.footer__statistics p`)
-};
-
-const generateExceptionsFiltersCount = (item) => {
-  if (item.includes(FilterName.ALL) || item.includes(FilterName.STATS)) {
-    return ``;
-  }
-  return Math.floor(Math.random() * FILTER_MAX_VALUE);
-};
-
-const generateFilters = () => {
-  return Object.values(FilterName).map((item) => {
-    const itemIndexOf = item.indexOf(` `);
-    const generateLink = item.slice(0, itemIndexOf !== -1 ? itemIndexOf : item.length).toLowerCase();
-    return {
-      name: item,
-      link: generateLink,
-      count: generateExceptionsFiltersCount(item)
-    };
-  });
 };
 
 const ExtraTitles = {
@@ -63,8 +42,8 @@ const Count = {
 };
 
 const RenderPosition = {
-  AFTERBEGIN: `afterbegin`,
-  BEFOREEND: `beforeend`
+  AFTERBEGIN: `afterBegin`,
+  BEFOREEND: `beforeEnd`
 };
 
 const KeyCode = {
@@ -77,4 +56,30 @@ const Mode = {
   POPUP: `popup`,
 };
 
-export {NAMES, GenreIndex, Nodes, generateFilters, ExtraTitles, SortType, Count, KeyCode, RenderPosition, Mode, FilterName};
+const ContainerTitle = {
+  CLASS: `visually-hidden`,
+  TEXT_CONTENT: `All movies. Upcoming`
+};
+
+const ButtonStatus = {
+  DELETING: `Deleting...`,
+  DELETE: `Delete`,
+  UNDOING: `Undoing...`,
+  UNDO: `Undo`
+};
+
+const DEBOUNCE_TIMEOUT = 500;
+
+const TagName = {
+  INPUT: `INPUT`,
+  BUTTON: `BUTTON`,
+  LABEL: `LABEL`,
+  A: `A`
+};
+
+const SortFlag = {
+  REVERSE: `reverse`,
+  LENGTH: `length`
+};
+
+export {NAMES, SortFlag, TagName, DEBOUNCE_TIMEOUT, GenreIndex, Nodes, ExtraTitles, SortType, Count, KeyCode, RenderPosition, Mode, FilterName, ContainerTitle, ButtonStatus};
