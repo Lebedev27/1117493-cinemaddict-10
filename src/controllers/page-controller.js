@@ -27,7 +27,7 @@ const createFilmCardFragment = (cardsData, onDataChange, onViewChange) => {
 
 const renderExtraFilmCard = (data, node, onDataChange, onViewChange) => {
   const createdFragment = createFilmCardFragment(data, onDataChange, onViewChange);
-  renderHtmlPart(node.querySelector(`.films-list__container`), createdFragment, RenderPosition.BEFOREEND);
+  renderHtmlPart(node.querySelector(`.films-list__container`), createdFragment, RenderPosition.BEFORE_END);
 };
 
 const renderFilmListExtra = (node, data, onDataChange, onViewChange) => {
@@ -95,10 +95,10 @@ export default class PageController {
       containerTitle.textContent = ContainerTitle.TEXT_CONTENT;
 
       const cardsOnStart = filmCards.slice(0, this._showingFilmsCount);
-      renderHtmlPart(this._filmsListContainer, createFilmCardFragment(cardsOnStart, this._onDataChange, this._onViewChange), RenderPosition.BEFOREEND);
+      renderHtmlPart(this._filmsListContainer, createFilmCardFragment(cardsOnStart, this._onDataChange, this._onViewChange), RenderPosition.BEFORE_END);
       this._renderShowMoreButton();
 
-      renderHtmlPart(this._container.getElement(), createFragment([new ExtraListComponent(ExtraTitles.TOP_RATED).getElement(), new ExtraListComponent(ExtraTitles.MOST_COMMENTED).getElement()]), RenderPosition.BEFOREEND);
+      renderHtmlPart(this._container.getElement(), createFragment([new ExtraListComponent(ExtraTitles.TOP_RATED).getElement(), new ExtraListComponent(ExtraTitles.MOST_COMMENTED).getElement()]), RenderPosition.BEFORE_END);
       renderFilmListExtra(this._container.getElement(), filmCards, this._onDataChange, this._onViewChange, this._filmModel);
 
       this._extraListComponents = this._container.getElement().querySelectorAll(`.films-list--extra`);
@@ -112,9 +112,9 @@ export default class PageController {
   }
 
   _renderCards(films) {
-    renderHtmlPart(this._filmsListContainer, createFilmCardFragment(films, this._onDataChange, this._onViewChange), RenderPosition.BEFOREEND);
+    renderHtmlPart(this._filmsListContainer, createFilmCardFragment(films, this._onDataChange, this._onViewChange), RenderPosition.BEFORE_END);
     this._showedFilmControllers = this._filmsListContainer.querySelectorAll(`.film-card`);
-    renderHtmlPart(this._container.getElement(), createFragment([new ExtraListComponent(ExtraTitles.TOP_RATED).getElement(), new ExtraListComponent(ExtraTitles.MOST_COMMENTED).getElement()]), RenderPosition.BEFOREEND);
+    renderHtmlPart(this._container.getElement(), createFragment([new ExtraListComponent(ExtraTitles.TOP_RATED).getElement(), new ExtraListComponent(ExtraTitles.MOST_COMMENTED).getElement()]), RenderPosition.BEFORE_END);
 
     renderFilmListExtra(this._container.getElement(), this._filmModel.getMoviesAll(), this._onDataChange, this._onViewChange, this._filmModel);
     this._showingFilmsCount = this._showedFilmControllers.length;
@@ -140,7 +140,7 @@ export default class PageController {
       return;
     }
 
-    renderHtmlPart(this._filmsList, this._showMoreButtonComponent.getElement(), RenderPosition.BEFOREEND);
+    renderHtmlPart(this._filmsList, this._showMoreButtonComponent.getElement(), RenderPosition.BEFORE_END);
 
     this._showMoreButtonComponent.setClickHandler(this.showMoreButtonClickHandler);
   }
@@ -242,7 +242,7 @@ export default class PageController {
 
     const unrenderedCards = this._filmModel.getMovies().slice(prevFilmsCount, this._showingFilmsCount);
 
-    renderHtmlPart(this._filmsListContainer, createFilmCardFragment(unrenderedCards, this._onDataChange, this._onViewChange, this._filmModel), RenderPosition.BEFOREEND);
+    renderHtmlPart(this._filmsListContainer, createFilmCardFragment(unrenderedCards, this._onDataChange, this._onViewChange, this._filmModel), RenderPosition.BEFORE_END);
 
     if (this._showingFilmsCount >= this._filmModel.getMovies().length) {
       remove(this._showMoreButtonComponent);

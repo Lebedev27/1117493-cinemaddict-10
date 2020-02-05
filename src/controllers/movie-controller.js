@@ -68,8 +68,8 @@ export default class MovieController {
       this._onViewChange();
       const filmCardPopupBg = this._filmCardPopupBgComponent.getElement();
 
-      renderHtmlPart(Nodes.BODY, filmCardPopupBg, RenderPosition.BEFOREEND);
-      renderHtmlPart(filmCardPopupBg, this._filmCardPopupComponent.getElement(), RenderPosition.BEFOREEND);
+      renderHtmlPart(Nodes.BODY, filmCardPopupBg, RenderPosition.BEFORE_END);
+      renderHtmlPart(filmCardPopupBg, this._filmCardPopupComponent.getElement(), RenderPosition.BEFORE_END);
 
       this._filmCardPopupComponent.setClickHandler(this._removePopupCkickHandler);
       this._filmCardPopupComponent.recoverListeners();

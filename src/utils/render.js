@@ -7,7 +7,7 @@ const createElement = (template) => {
 };
 
 const renderHtmlPart = (container, component, place) => {
-  if (place === RenderPosition.AFTERBEGIN) {
+  if (place === RenderPosition.AFTER_BEGIN) {
     container.prepend(component);
   } else {
     container.append(component);

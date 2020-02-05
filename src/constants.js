@@ -42,8 +42,8 @@ const Count = {
 };
 
 const RenderPosition = {
-  AFTERBEGIN: `afterBegin`,
-  BEFOREEND: `beforeEnd`
+  AFTER_BEGIN: `afterBegin`,
+  BEFORE_END: `beforeEnd`
 };
 
 const KeyCode = {

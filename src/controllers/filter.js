@@ -35,7 +35,7 @@ export default class FilterController {
     if (oldComponent) {
       replace(this._filterComponent, oldComponent);
     } else {
-      renderHtmlPart(this._container, this._filterComponent.getElement(), RenderPosition.BEFOREEND);
+      renderHtmlPart(this._container, this._filterComponent.getElement(), RenderPosition.BEFORE_END);
     }
   }
 

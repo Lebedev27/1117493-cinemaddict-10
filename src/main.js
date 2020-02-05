@@ -52,14 +52,14 @@ const pasteElements = () => {
       const pageController = new PageController(filmListComponent, sortingComponent, moviesModel, apiWithProvider);
       const statisticsComponent = new StatisticsComponent(moviesModel);
 
-      renderHtmlPart(Nodes.HEADER, new ProfileStatusComponent(moviesModel).getElement(), RenderPosition.BEFOREEND);
+      renderHtmlPart(Nodes.HEADER, new ProfileStatusComponent(moviesModel).getElement(), RenderPosition.BEFORE_END);
 
       const filterController = new FilterController(Nodes.MAIN, moviesModel, showStatisticHandler(pageController, statisticsComponent));
       filterController.render();
 
       renderHtmlPart(filmListComponent.getElement().querySelector(`.films-list`), new FilmListTitleComponent(allMovies).getElement(), RenderPosition.AFTERBEGIN);
-      renderHtmlPart(Nodes.MAIN, createFragment([sortingComponent.getElement(), filmListComponent.getElement()]), RenderPosition.BEFOREEND);
-      renderHtmlPart(Nodes.MAIN, statisticsComponent.getElement(), RenderPosition.BEFOREEND);
+      renderHtmlPart(Nodes.MAIN, createFragment([sortingComponent.getElement(), filmListComponent.getElement()]), RenderPosition.BEFORE_END);
+      renderHtmlPart(Nodes.MAIN, statisticsComponent.getElement(), RenderPosition.BEFORE_END);
       statisticsComponent.hide();
 
       Nodes.FOOTER_STATISTIC.textContent = `${allMovies.length} movies inside`;
